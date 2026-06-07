@@ -1,0 +1,97 @@
+================================================================================
+ENGINEERED FEATURES DOCUMENTATION
+================================================================================
+
+Total Features: 18
+Total Rows: 10113
+
+
+1. sender_balance_change
+   Description: Change in sender's balance (newbalanceOrig - oldbalanceOrg). Negative = money sent, Positive = unusual.
+   Data Type: float64
+   Min: -2.5115, Max: 2.5382, Mean: 0.0000
+
+2. receiver_balance_change
+   Description: Change in receiver's balance (newbalanceDest - oldbalanceDest). Usually positive for legitimate transfers.
+   Data Type: float64
+   Min: -2.5569, Max: 2.4930, Mean: 0.0000
+
+3. sender_balance_change_abs
+   Description: Absolute value of sender's balance change.
+   Data Type: float64
+   Min: 0.0000, Max: 2.5382, Mean: 0.0604
+
+4. receiver_balance_change_abs
+   Description: Absolute value of receiver's balance change.
+   Data Type: float64
+   Min: 0.0001, Max: 2.5569, Mean: 0.2000
+
+5. sender_balance_change_ratio
+   Description: Sender's balance change relative to original balance. Large negative values indicate account depletion.
+   Data Type: float64
+   Min: -184.7891, Max: 652.6195, Mean: -0.0649
+
+6. receiver_balance_change_ratio
+   Description: Receiver's balance change relative to original balance.
+   Data Type: float64
+   Min: -403.1410, Max: 1640.0757, Mean: 0.1983
+
+7. amount_ratio_sender_balance
+   Description: Transaction amount relative to sender's original balance. Values > 1.0 mean transaction exceeds available balance (suspicious).
+   Data Type: float64
+   Min: -25442.4298, Max: 591.8741, Mean: -2.6682
+
+8. amount_ratio_receiver_balance
+   Description: Transaction amount relative to receiver's original balance.
+   Data Type: float64
+   Min: -196.6002, Max: 1306.5204, Mean: 0.6481
+
+9. sender_depletes_account
+   Description: Binary: 1 if transaction depletes sender's account by ≥99%
+   Data Type: int64
+   Min: 0.0000, Max: 1.0000, Mean: 0.0367
+
+10. receiver_had_zero_balance
+   Description: Binary: 1 if receiver had zero balance before transaction
+   Data Type: int64
+   Min: 0.0000, Max: 0.0000, Mean: 0.0000
+
+11. is_high_value_transaction
+   Description: Binary: 1 if transaction amount ≥ 90th percentile (2.16)
+   Data Type: int64
+   Min: 0.0000, Max: 1.0000, Mean: 0.1047
+
+12. current_to_savings_transfer
+   Description: Binary: 1 if current account initiating TRANSFER (higher risk)
+   Data Type: int64
+   Min: 0.0000, Max: 1.0000, Mean: 0.0288
+
+13. cashout_with_unusual_login
+   Description: Binary: 1 if CASH_OUT with high unusual login score
+   Data Type: int64
+   Min: 0.0000, Max: 0.0000, Mean: 0.0000
+
+14. high_fraud_branch_high_amount
+   Description: Binary: 1 if high-fraud-rate branch + high-value transaction
+   Data Type: int64
+   Min: 0.0000, Max: 1.0000, Mean: 0.0359
+
+15. flagged_and_unusual
+   Description: Binary: 1 if already flagged by system + unusual login
+   Data Type: int64
+   Min: 0.0000, Max: 0.0000, Mean: 0.0000
+
+16. suspicion_score
+   Description: Cumulative suspicion score: sum of 5 binary fraud indicators. Range: 0-5. Higher = more suspicious.
+   Data Type: int64
+   Min: 0.0000, Max: 2.0000, Mean: 0.0726
+
+17. risk_exposure_sender
+   Description: Combined sender risk: balance change ratio × amount ratio. Captures both account depletion and unusual amounts.
+   Data Type: float64
+   Min: -16604224.7097, Max: 107807.6291, Mean: -1630.1634
+
+18. total_money_flow
+   Description: Total absolute money movement in transaction
+   Data Type: float64
+   Min: 0.0019, Max: 5.0046, Mean: 0.2604

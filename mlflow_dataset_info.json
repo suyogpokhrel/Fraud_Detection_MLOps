@@ -1,0 +1,8 @@
+{
+  "total_samples": 10113,
+  "fraud_samples": 68,
+  "legit_samples": 10045,
+  "fraud_rate": 0.67,
+  "features": 34,
+  "test_split": 0.2
+}

@@ -1,0 +1,16 @@
+step
+amount
+oldbalanceOrg
+newbalanceOrig
+oldbalanceDest
+newbalanceDest
+unusuallogin
+isFlaggedFraud
+type_CASH_IN
+type_CASH_OUT
+type_DEBIT
+type_PAYMENT
+type_TRANSFER
+acct_type_Current
+acct_type_Savings
+branch_fraud_rate

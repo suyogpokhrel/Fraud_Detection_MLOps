@@ -1,0 +1,36 @@
+Collecting package metadata (current_repodata.json): ...working... done
+Solving environment: ...working... done
+
+## Package Plan ##
+
+  environment location: /home/suyog/miniconda3/envs/fraud_mlops
+
+  added / updated specs:
+    - email-validator
+
+
+The following packages will be downloaded:
+
+    package                    |            build
+    ---------------------------|-----------------
+    dnspython-2.8.0            |  py311h06a4308_0         645 KB
+    email-validator-2.3.0      |  py311h06a4308_0          65 KB
+    idna-3.18                  |  py311h06a4308_0         185 KB
+    ------------------------------------------------------------
+                                           Total:         895 KB
+
+The following NEW packages will be INSTALLED:
+
+  dnspython          pkgs/main/linux-64::dnspython-2.8.0-py311h06a4308_0
+  email-validator    pkgs/main/linux-64::email-validator-2.3.0-py311h06a4308_0
+  idna               pkgs/main/linux-64::idna-3.18-py311h06a4308_0
+
+
+
+Downloading and Extracting Packages
+dnspython-2.8.0      | 645 KB    |            |   0% dnspython-2.8.0      | 645 KB    | 2          |   2% dnspython-2.8.0      | 645 KB    | #2         |  12% dnspython-2.8.0      | 645 KB    | ##4        |  25% dnspython-2.8.0      | 645 KB    | ####7      |  47% dnspython-2.8.0      | 645 KB    | ########4  |  84% dnspython-2.8.0      | 645 KB    | ########## | 100% 
+email-validator-2.3. | 65 KB     |            |   0% email-validator-2.3. | 65 KB     | ##4        |  25% email-validator-2.3. | 65 KB     | ########## | 100% email-validator-2.3. | 65 KB     | ########## | 100% 
+idna-3.18            | 185 KB    |            |   0% idna-3.18            | 185 KB    | 8          |   9% idna-3.18            | 185 KB    | ########## | 100% idna-3.18            | 185 KB    | ########## | 100% 
+Preparing transaction: ...working... done
+Verifying transaction: ...working... done
+Executing transaction: ...working... done

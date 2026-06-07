@@ -1,0 +1,34 @@
+ 1. step
+ 2. amount
+ 3. oldbalanceOrg
+ 4. newbalanceOrig
+ 5. oldbalanceDest
+ 6. newbalanceDest
+ 7. unusuallogin
+ 8. isFlaggedFraud
+ 9. type_CASH_IN
+10. type_CASH_OUT
+11. type_DEBIT
+12. type_PAYMENT
+13. type_TRANSFER
+14. acct_type_Current
+15. acct_type_Savings
+16. branch_fraud_rate
+17. sender_balance_change
+18. receiver_balance_change
+19. sender_balance_change_abs
+20. receiver_balance_change_abs
+21. sender_balance_change_ratio
+22. receiver_balance_change_ratio
+23. amount_ratio_sender_balance
+24. amount_ratio_receiver_balance
+25. sender_depletes_account
+26. receiver_had_zero_balance
+27. is_high_value_transaction
+28. current_to_savings_transfer
+29. cashout_with_unusual_login
+30. high_fraud_branch_high_amount
+31. flagged_and_unusual
+32. suspicion_score
+33. risk_exposure_sender
+34. total_money_flow

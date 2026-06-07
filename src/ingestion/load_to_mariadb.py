@@ -1,0 +1,73 @@
+from pathlib import Path
+import os
+import pandas as pd
+
+from database.db_connection import get_connection
+
+
+def load_processed_csv(repo_root: Path):
+    csv_path = repo_root / "data" / "processed" / "processed_data.csv"
+    if not csv_path.exists():
+        raise FileNotFoundError(f"Processed CSV not found: {csv_path}")
+
+    df = pd.read_csv(csv_path)
+
+    # Normalize column names for the database table.
+    rename_map = {
+        "Acct type": "acct_type",
+        "Date of transaction": "date_of_transaction",
+        "Time of day": "time_of_day",
+    }
+    df = df.rename(columns=rename_map)
+
+    if "datetime" in df.columns:
+        df["datetime"] = pd.to_datetime(df["datetime"], errors="coerce")
+
+    # MariaDB ColumnStore works well with flat tables. We keep one row per transaction.
+    insert_sql = """
+        INSERT INTO processed_transactions (
+            step, type, branch, amount, nameOrig, oldbalanceOrg, newbalanceOrig,
+            nameDest, oldbalanceDest, newbalanceDest, unusuallogin, isFlaggedFraud,
+            acct_type, date_of_transaction, time_of_day, isFraud, datetime
+        ) VALUES (
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        )
+    """
+
+    conn = get_connection()
+    try:
+        cur = conn.cursor()
+        rows = []
+        for _, row in df.iterrows():
+            rows.append(
+                (
+                    int(row["step"]) if pd.notna(row["step"]) else None,
+                    row.get("type"),
+                    row.get("branch"),
+                    float(row["amount"]) if pd.notna(row["amount"]) else None,
+                    row.get("nameOrig"),
+                    float(row["oldbalanceOrg"]) if pd.notna(row["oldbalanceOrg"]) else None,
+                    float(row["newbalanceOrig"]) if pd.notna(row["newbalanceOrig"]) else None,
+                    row.get("nameDest"),
+                    float(row["oldbalanceDest"]) if pd.notna(row["oldbalanceDest"]) else None,
+                    float(row["newbalanceDest"]) if pd.notna(row["newbalanceDest"]) else None,
+                    int(row["unusuallogin"]) if pd.notna(row["unusuallogin"]) else None,
+                    int(row["isFlaggedFraud"]) if pd.notna(row["isFlaggedFraud"]) else None,
+                    row.get("acct_type"),
+                    row.get("date_of_transaction"),
+                    row.get("time_of_day"),
+                    int(row["isFraud"]) if pd.notna(row["isFraud"]) else None,
+                    row["datetime"] if pd.notna(row["datetime"]) else None,
+                )
+            )
+
+        cur.executemany(insert_sql, rows)
+        conn.commit()
+        print(f"Inserted {len(rows)} rows into processed_transactions")
+    finally:
+        conn.close()
+
+
+if __name__ == "__main__":
+    repo_root = Path(__file__).resolve().parents[2]
+    load_processed_csv(repo_root)
