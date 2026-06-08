@@ -13,7 +13,7 @@ FEATURE_LIST = repo_root / "data" / "engineered_features" / "all_features.txt"
 
 
 def load_model_and_metadata():
-    model_path = MODEL_DIR / "logistic_regression.pkl"
+    model_path = MODEL_DIR / "best_model.pkl"
     scaler_path = MODEL_DIR / "scaler.pkl"
     if not model_path.exists() or not scaler_path.exists():
         raise FileNotFoundError("Trained model or scaler not found in models/trained_models")

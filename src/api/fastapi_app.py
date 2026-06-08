@@ -37,7 +37,7 @@ app.add_middleware(
 )
 
 # Load trained model and transformers at startup
-MODEL_PATH = repo_root / "models" / "trained_models" / "logistic_regression.pkl"
+MODEL_PATH = repo_root / "models" / "trained_models" / "best_model.pkl"
 SCALER_PATH = repo_root / "models" / "trained_models" / "scaler.pkl"
 
 try:
