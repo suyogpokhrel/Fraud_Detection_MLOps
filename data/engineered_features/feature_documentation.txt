@@ -3,18 +3,18 @@ ENGINEERED FEATURES DOCUMENTATION
 ================================================================================
 
 Total Features: 18
-Total Rows: 10113
+Total Rows: 50565
 
 
 1. sender_balance_change
    Description: Change in sender's balance (newbalanceOrig - oldbalanceOrg). Negative = money sent, Positive = unusual.
    Data Type: float64
-   Min: -2.5115, Max: 2.5382, Mean: 0.0000
+   Min: -2.5115, Max: 2.5382, Mean: -0.0000
 
 2. receiver_balance_change
    Description: Change in receiver's balance (newbalanceDest - oldbalanceDest). Usually positive for legitimate transfers.
    Data Type: float64
-   Min: -2.5569, Max: 2.4930, Mean: 0.0000
+   Min: -2.5569, Max: 2.4930, Mean: -0.0000
 
 3. sender_balance_change_abs
    Description: Absolute value of sender's balance change.
@@ -89,7 +89,7 @@ Total Rows: 10113
 17. risk_exposure_sender
    Description: Combined sender risk: balance change ratio × amount ratio. Captures both account depletion and unusual amounts.
    Data Type: float64
-   Min: -16604224.7097, Max: 107807.6291, Mean: -1630.1634
+   Min: -16604224.7096, Max: 107807.6291, Mean: -1630.1634
 
 18. total_money_flow
    Description: Total absolute money movement in transaction

@@ -53,11 +53,11 @@ def load_processed_csv(repo_root: Path):
                     float(row["newbalanceDest"]) if pd.notna(row["newbalanceDest"]) else None,
                     int(row["unusuallogin"]) if pd.notna(row["unusuallogin"]) else None,
                     int(row["isFlaggedFraud"]) if pd.notna(row["isFlaggedFraud"]) else None,
-                    row.get("acct_type"),
-                    row.get("date_of_transaction"),
-                    row.get("time_of_day"),
+                    str(row.get("acct_type")) if pd.notna(row.get("acct_type")) else None,
+                    str(row.get("date_of_transaction")) if pd.notna(row.get("date_of_transaction")) else None,
+                    str(row.get("time_of_day")) if pd.notna(row.get("time_of_day")) else None,
                     int(row["isFraud"]) if pd.notna(row["isFraud"]) else None,
-                    row["datetime"] if pd.notna(row["datetime"]) else None,
+                    str(row["datetime"]) if pd.notna(row["datetime"]) else None,
                 )
             )
 

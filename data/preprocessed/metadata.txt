@@ -1,6 +1,6 @@
-total_rows: 10113
+total_rows: 50565
 total_features: 16
 numeric_columns: ['step', 'amount', 'oldbalanceOrg', 'newbalanceOrig', 'oldbalanceDest', 'newbalanceDest', 'unusuallogin']
 categorical_columns_low: ['type', 'acct_type']
 categorical_columns_high: ['branch']
-target_distribution: {0: 10045, 1: 68}
+target_distribution: {0: 50225, 1: 340}

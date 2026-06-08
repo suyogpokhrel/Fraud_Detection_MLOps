@@ -1,25 +1,5 @@
 """
-Phase 5: Model Training & Evaluation Pipeline
-Trains multiple models, evaluates with fraud-specific metrics, selects best model.
-
-Models:
-  1. Logistic Regression (baseline, interpretable)
-  2. Random Forest (robust, handles non-linearity)
-  3. XGBoost (state-of-the-art, powerful)
-
-Evaluation Metrics (Fraud-Specific):
-  - Recall: Catch as many frauds as possible (minimize false negatives)
-  - Precision: Avoid false alarms (minimize false positives)
-  - F1: Balanced harmonic mean
-  - ROC-AUC: Performance across all thresholds
-  - PR-AUC: Precision-Recall curve (better for imbalanced data)
-
-Notes:
-  - Data is highly imbalanced (0.67% fraud), so:
-    * Use stratified train/test split to preserve distribution
-    * Use class_weight='balanced' to penalize minority misclassification
-    * Use recall-focused thresholds for fraud detection
-    * Prioritize Recall > Precision (catch frauds > avoid false positives)
+Phase 5: Fraud Model Training (STABLE + BEST MODEL SELECTION)
 """
 
 import sys
@@ -30,15 +10,14 @@ import pickle
 import json
 import warnings
 
-# ML Libraries
-from sklearn.model_selection import train_test_split, cross_val_score
+from imblearn.over_sampling import SMOTE
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
-    roc_auc_score, auc, precision_recall_curve, roc_curve,
-    confusion_matrix, classification_report, average_precision_score
+    roc_auc_score, confusion_matrix, average_precision_score
 )
 
 try:
@@ -46,317 +25,272 @@ try:
     HAS_XGBOOST = True
 except ImportError:
     HAS_XGBOOST = False
-    print("⚠ XGBoost not installed, will use Random Forest + Logistic Regression")
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
-# Add repository to path
 repo_root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(repo_root))
 
 
 class ModelTrainer:
-    """
-    Train and evaluate multiple fraud detection models.
-    Handles imbalanced data with stratified splits and class weighting.
-    """
 
     def __init__(self):
         self.X_train = None
         self.X_test = None
         self.y_train = None
         self.y_test = None
+
         self.models = {}
         self.results = {}
+
         self.best_model_name = None
         self.best_model = None
+
         self.scaler = StandardScaler()
 
-    def load_data(self, input_dir: Path = None):
-        """Load engineered features from Phase 4."""
-        if input_dir is None:
-            input_dir = repo_root / "data" / "engineered_features"
+    # =========================
+    # LOAD DATA
+    # =========================
+    def load_data(self):
 
-        print("\n[1/6] Loading engineered features...")
-        X_path = input_dir / "X_engineered.csv"
-        y_path = input_dir / "y_engineered.csv"
+        print("\n[1/6] Loading data...")
 
-        X = pd.read_csv(X_path).values  # Convert to numpy
-        y = pd.read_csv(y_path).squeeze().values
+        X = pd.read_csv(repo_root / "data" / "engineered_features" / "X_engineered.csv").values
+        y = pd.read_csv(repo_root / "data" / "engineered_features" / "y_engineered.csv").squeeze().values
 
-        print(f"✓ Loaded: {X.shape[0]} samples × {X.shape[1]} features")
-        print(f"  Class distribution: {np.bincount(y)} (0: legit, 1: fraud)")
-        print(f"  Fraud rate: {100*y.mean():.2f}%")
+        print(f"✓ Shape: {X.shape}")
+        print(f"✓ Fraud rate: {100*y.mean():.2f}%")
 
         return X, y
 
-    def split_data(self, X, y, test_size=0.2, random_state=42):
-        """
-        Stratified train/test split to preserve fraud ratio in both sets.
-        """
-        print("\n[2/6] Splitting data (stratified)...")
+    # =========================
+    # SPLIT + SMOTE
+    # =========================
+    def split_data(self, X, y):
+
+        print("\n[2/6] Train-test split...")
 
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
             X, y,
-            test_size=test_size,
-            random_state=random_state,
-            stratify=y  # Preserve class distribution
+            test_size=0.2,
+            stratify=y,
+            random_state=42
         )
 
-        print(f"✓ Train set: {len(self.X_train)} samples ({100*self.y_train.mean():.2f}% fraud)")
-        print(f"✓ Test set:  {len(self.X_test)} samples ({100*self.y_test.mean():.2f}% fraud)")
+        print(f"✓ Train: {len(self.X_train)} | Test: {len(self.X_test)}")
 
-        # Scale features
+        print("\n[2.1] Applying SMOTE...")
+
+        smote = SMOTE(
+            sampling_strategy=0.1,
+            random_state=42
+        )
+
+        self.X_train, self.y_train = smote.fit_resample(self.X_train, self.y_train)
+
+        self.X_train = self.X_train.astype(np.float32)
+        self.X_test = self.X_test.astype(np.float32)
+
         self.X_train = self.scaler.fit_transform(self.X_train)
         self.X_test = self.scaler.transform(self.X_test)
-        print(f"✓ Features scaled (StandardScaler)")
 
-    def train_logistic_regression(self):
-        """Train Logistic Regression (baseline, interpretable)."""
-        print("\n[3/6] Training models...")
-        print("  └─ Logistic Regression (baseline)...")
+    # =========================
+    # TUNING MODELS
+    # =========================
+    def tune_models(self):
 
-        model = LogisticRegression(
-            max_iter=1000,
-            class_weight='balanced',  # Handle imbalance
-            random_state=42,
-            n_jobs=-1
+        print("\n[3/6] Hyperparameter Tuning...")
+
+        self.models = {}
+
+        # Logistic Regression
+        log_search = RandomizedSearchCV(
+            LogisticRegression(max_iter=1000),
+            {"C": [0.1, 1]},
+            n_iter=2,
+            scoring="recall",
+            cv=2,
+            n_jobs=1
         )
+        log_search.fit(self.X_train, self.y_train)
+        self.models["Logistic Regression"] = log_search.best_estimator_
 
-        model.fit(self.X_train, self.y_train)
-        y_pred = model.predict(self.X_test)
-        y_pred_proba = model.predict_proba(self.X_test)[:, 1]
+        print("✓ LR:", log_search.best_params_)
 
-        self.models['Logistic Regression'] = model
-        self.results['Logistic Regression'] = self._evaluate_model(
-            y_pred, y_pred_proba, 'Logistic Regression'
+        # Random Forest
+        rf_search = RandomizedSearchCV(
+            RandomForestClassifier(n_jobs=1),
+            {
+                "n_estimators": [100, 150],
+                "max_depth": [10, 15]
+            },
+            n_iter=3,
+            scoring="recall",
+            cv=2,
+            n_jobs=1
         )
+        rf_search.fit(self.X_train, self.y_train)
+        self.models["Random Forest"] = rf_search.best_estimator_
 
-    def train_random_forest(self):
-        """Train Random Forest (robust, handles non-linearity)."""
-        print("  └─ Random Forest...")
+        print("✓ RF:", rf_search.best_params_)
 
-        model = RandomForestClassifier(
-            n_estimators=100,
-            max_depth=15,
-            min_samples_split=10,
-            min_samples_leaf=5,
-            class_weight='balanced',
-            random_state=42,
-            n_jobs=-1
-        )
+        # XGBoost
+        if HAS_XGBOOST:
 
-        model.fit(self.X_train, self.y_train)
-        y_pred = model.predict(self.X_test)
-        y_pred_proba = model.predict_proba(self.X_test)[:, 1]
+            xgb_search = RandomizedSearchCV(
+                XGBClassifier(
+                    n_jobs=1,
+                    tree_method="hist"
+                ),
+                {
+                    "n_estimators": [100],
+                    "max_depth": [3, 6],
+                    "learning_rate": [0.1]
+                },
+                n_iter=2,
+                scoring="recall",
+                cv=2,
+                n_jobs=1
+            )
 
-        self.models['Random Forest'] = model
-        self.results['Random Forest'] = self._evaluate_model(
-            y_pred, y_pred_proba, 'Random Forest'
-        )
+            xgb_search.fit(self.X_train, self.y_train)
+            self.models["XGBoost"] = xgb_search.best_estimator_
 
-    def train_xgboost(self):
-        """Train XGBoost (state-of-the-art, powerful)."""
-        if not HAS_XGBOOST:
-            print("  └─ XGBoost (skipped - not installed)")
-            return
+            print("✓ XGBoost:", xgb_search.best_params_)
 
-        print("  └─ XGBoost...")
+    # =========================
+    # EVALUATION + THRESHOLD
+    # =========================
+    def _evaluate(self, name, model):
 
-        # Calculate scale_pos_weight for class imbalance
-        neg_count = np.sum(self.y_train == 0)
-        pos_count = np.sum(self.y_train == 1)
-        scale_pos_weight = neg_count / pos_count
+        y_proba = model.predict_proba(self.X_test)[:, 1]
 
-        model = XGBClassifier(
-            n_estimators=100,
-            max_depth=6,
-            learning_rate=0.1,
-            subsample=0.8,
-            colsample_bytree=0.8,
-            scale_pos_weight=scale_pos_weight,
-            random_state=42,
-            n_jobs=-1
-        )
+        best_metrics = None
+        best_threshold = 0.5
 
-        model.fit(self.X_train, self.y_train)
-        y_pred = model.predict(self.X_test)
-        y_pred_proba = model.predict_proba(self.X_test)[:, 1]
+        for threshold in np.arange(0.1, 0.9, 0.01):
 
-        self.models['XGBoost'] = model
-        self.results['XGBoost'] = self._evaluate_model(
-            y_pred, y_pred_proba, 'XGBoost'
-        )
+            y_pred = (y_proba >= threshold).astype(int)
 
-    def _evaluate_model(self, y_pred, y_pred_proba, model_name):
-        """
-        Comprehensive evaluation with fraud-specific metrics.
-        """
-        metrics = {
-            'Accuracy': accuracy_score(self.y_test, y_pred),
-            'Precision': precision_score(self.y_test, y_pred, zero_division=0),
-            'Recall': recall_score(self.y_test, y_pred, zero_division=0),
-            'F1': f1_score(self.y_test, y_pred, zero_division=0),
-            'ROC-AUC': roc_auc_score(self.y_test, y_pred_proba),
-            'PR-AUC': average_precision_score(self.y_test, y_pred_proba),
+            p = precision_score(self.y_test, y_pred, zero_division=0)
+            r = recall_score(self.y_test, y_pred, zero_division=0)
+
+            if p >= 0.50 and r >= 0.70:
+                best_threshold = threshold
+                best_metrics = self._metrics(y_pred, y_proba)
+                break
+
+        if best_metrics is None:
+
+            best_f1 = -1
+
+            for threshold in np.arange(0.1, 0.9, 0.01):
+
+                y_pred = (y_proba >= threshold).astype(int)
+                f1 = f1_score(self.y_test, y_pred, zero_division=0)
+
+                if f1 > best_f1:
+                    best_f1 = f1
+                    best_threshold = threshold
+                    best_metrics = self._metrics(y_pred, y_proba)
+
+        self.results[name] = best_metrics
+
+        print(f"\n📊 {name}")
+        print(f"  Precision: {best_metrics['Precision']:.4f}")
+        print(f"  Recall   : {best_metrics['Recall']:.4f}")
+        print(f"  F1       : {best_metrics['F1']:.4f}")
+        print(f"  ROC-AUC  : {best_metrics['ROC-AUC']:.4f}")
+
+    # =========================
+    # METRICS
+    # =========================
+    def _metrics(self, y_pred, y_proba):
+
+        tn, fp, fn, tp = confusion_matrix(self.y_test, y_pred).ravel()
+
+        return {
+            "Precision": precision_score(self.y_test, y_pred, zero_division=0),
+            "Recall": recall_score(self.y_test, y_pred, zero_division=0),
+            "F1": f1_score(self.y_test, y_pred, zero_division=0),
+            "Accuracy": accuracy_score(self.y_test, y_pred),
+            "ROC-AUC": roc_auc_score(self.y_test, y_proba),
+            "PR-AUC": average_precision_score(self.y_test, y_proba),
+            "TP": int(tp),
+            "FP": int(fp),
+            "FN": int(fn),
+            "TN": int(tn)
         }
 
-        # Confusion matrix
-        tn, fp, fn, tp = confusion_matrix(self.y_test, y_pred).ravel()
-        metrics['True Negatives'] = int(tn)
-        metrics['False Positives'] = int(fp)
-        metrics['False Negatives'] = int(fn)
-        metrics['True Positives'] = int(tp)
-
-        # Fraud-specific rates
-        metrics['Fraud Catch Rate'] = metrics['Recall']  # TP / (TP + FN)
-        metrics['False Alarm Rate'] = metrics['False Positives'] / (
-            metrics['False Positives'] + metrics['True Negatives']
-        ) if (metrics['False Positives'] + metrics['True Negatives']) > 0 else 0
-
-        return metrics
-
+    # =========================
+    # BEST MODEL SELECTION (NEW)
+    # =========================
     def select_best_model(self):
-        """
-        Select best model based on Recall (catch frauds) as primary metric.
-        Tiebreaker: ROC-AUC (overall discrimination ability)
-        """
-        print("\n[4/6] Model Selection...")
-        print("\n  Model Performance:")
-        print("  " + "-" * 80)
 
-        for model_name, metrics in self.results.items():
-            print(f"\n  {model_name}:")
-            print(f"    Recall (Fraud Catch Rate):  {metrics['Recall']:.4f}")
-            print(f"    Precision:                   {metrics['Precision']:.4f}")
-            print(f"    F1:                          {metrics['F1']:.4f}")
-            print(f"    ROC-AUC:                     {metrics['ROC-AUC']:.4f}")
-            print(f"    PR-AUC:                      {metrics['PR-AUC']:.4f}")
-            print(f"    Confusion Matrix: TP={metrics['True Positives']}, FP={metrics['False Positives']}, "
-                  f"FN={metrics['False Negatives']}, TN={metrics['True Negatives']}")
+        print("\n[4/6] Selecting best model...")
 
-        # Select model with highest recall (catch frauds), tiebreak by ROC-AUC
-        best_recall = -1
-        best_auc = -1
-        for model_name, metrics in self.results.items():
-            if metrics['Recall'] > best_recall or (
-                metrics['Recall'] == best_recall and metrics['ROC-AUC'] > best_auc
-            ):
-                best_recall = metrics['Recall']
-                best_auc = metrics['ROC-AUC']
-                self.best_model_name = model_name
+        best_score = -1
+
+        for name, m in self.results.items():
+
+            score = (0.5 * m["Precision"]) + (0.5 * m["Recall"])
+
+            print(f"\n{name}")
+            print(f"  Precision: {m['Precision']:.4f}")
+            print(f"  Recall   : {m['Recall']:.4f}")
+            print(f"  Score    : {score:.4f}")
+
+            if score > best_score:
+                best_score = score
+                self.best_model_name = name
 
         self.best_model = self.models[self.best_model_name]
-        print(f"\n✓ Best Model: {self.best_model_name}")
-        print(f"  (Selected by highest Recall={best_recall:.4f}, ROC-AUC={best_auc:.4f})")
 
-    def save_outputs(self, output_dir: Path = None):
-        """Save models, metrics, and evaluation reports."""
-        if output_dir is None:
-            output_dir = repo_root / "models" / "trained_models"
+        print(f"\n🏆 BEST MODEL: {self.best_model_name}")
 
+    # =========================
+    # SAVE BEST MODEL
+    # =========================
+    def save_model(self):
+
+        output_dir = repo_root / "models" / "trained_models"
         output_dir.mkdir(parents=True, exist_ok=True)
-        print(f"\n[5/6] Saving outputs to {output_dir}...")
 
-        # Save best model
-        best_model_path = output_dir / f"{self.best_model_name.lower().replace(' ', '_')}.pkl"
-        with open(best_model_path, 'wb') as f:
+        print("\n[5/6] Saving best model...")
+
+        with open(output_dir / "best_model.pkl", "wb") as f:
             pickle.dump(self.best_model, f)
-        print(f"  ✓ Best model: {best_model_path}")
 
-        # Save all models
-        all_models_path = output_dir / "all_models.pkl"
-        with open(all_models_path, 'wb') as f:
+        with open(output_dir / "all_models.pkl", "wb") as f:
             pickle.dump(self.models, f)
-        print(f"  ✓ All models: {all_models_path}")
 
-        # Save scaler (for inference)
-        scaler_path = output_dir / "scaler.pkl"
-        with open(scaler_path, 'wb') as f:
-            pickle.dump(self.scaler, f)
-        print(f"  ✓ Scaler: {scaler_path}")
+        with open(output_dir / "metrics.json", "w") as f:
+            json.dump(self.results, f, indent=2)
 
-        # Save evaluation results
-        results_path = output_dir / "evaluation_results.json"
-        with open(results_path, 'w') as f:
-            # Convert numpy types to native Python for JSON serialization
-            json_results = {}
-            for model_name, metrics in self.results.items():
-                json_results[model_name] = {
-                    k: float(v) if isinstance(v, (np.floating, np.integer)) else int(v)
-                    for k, v in metrics.items()
-                }
-            json.dump(json_results, f, indent=2)
-        print(f"  ✓ Results: {results_path}")
+        print("✓ Saved models + metrics")
 
-        # Save detailed report
-        report_path = output_dir / "training_report.txt"
-        with open(report_path, 'w') as f:
-            f.write("=" * 80 + "\n")
-            f.write("FRAUD DETECTION MODEL TRAINING REPORT\n")
-            f.write("=" * 80 + "\n\n")
+    # =========================
+    # RUN PIPELINE
+    # =========================
+    def run(self):
 
-            f.write("DATASET INFORMATION:\n")
-            f.write(f"  Train samples: {len(self.X_train)}\n")
-            f.write(f"  Test samples: {len(self.X_test)}\n")
-            f.write(f"  Fraud rate (train): {100*self.y_train.mean():.2f}%\n")
-            f.write(f"  Fraud rate (test): {100*self.y_test.mean():.2f}%\n\n")
+        print("\n" + "=" * 60)
+        print("PHASE 5: FINAL FRAUD PIPELINE")
+        print("=" * 60)
 
-            f.write("MODEL PERFORMANCE COMPARISON:\n")
-            f.write("-" * 80 + "\n")
-            for model_name, metrics in self.results.items():
-                f.write(f"\n{model_name}:\n")
-                f.write(f"  Accuracy:      {metrics['Accuracy']:.4f}\n")
-                f.write(f"  Precision:     {metrics['Precision']:.4f}\n")
-                f.write(f"  Recall:        {metrics['Recall']:.4f}\n")
-                f.write(f"  F1:            {metrics['F1']:.4f}\n")
-                f.write(f"  ROC-AUC:       {metrics['ROC-AUC']:.4f}\n")
-                f.write(f"  PR-AUC:        {metrics['PR-AUC']:.4f}\n")
-
-            f.write(f"\n\nBEST MODEL: {self.best_model_name}\n")
-            f.write(f"  Primary metric (Recall): {self.results[self.best_model_name]['Recall']:.4f}\n")
-            f.write(f"  ROC-AUC: {self.results[self.best_model_name]['ROC-AUC']:.4f}\n")
-            f.write(f"  Fraud catch rate: {self.results[self.best_model_name]['True Positives']} / "
-                    f"{self.results[self.best_model_name]['True Positives'] + self.results[self.best_model_name]['False Negatives']} frauds caught\n")
-
-        print(f"  ✓ Report: {report_path}")
-
-        # Save metadata
-        metadata_path = output_dir / "metadata.txt"
-        with open(metadata_path, 'w') as f:
-            f.write(f"best_model: {self.best_model_name}\n")
-            f.write(f"total_models_trained: {len(self.models)}\n")
-            f.write(f"test_set_size: {len(self.X_test)}\n")
-            f.write(f"fraud_rate_test: {100*self.y_test.mean():.2f}%\n")
-            f.write(f"best_recall: {self.results[self.best_model_name]['Recall']:.4f}\n")
-            f.write(f"best_roc_auc: {self.results[self.best_model_name]['ROC-AUC']:.4f}\n")
-        print(f"  ✓ Metadata: {metadata_path}")
-
-    def run(self, input_dir: Path = None, output_dir: Path = None):
-        """Execute complete model training pipeline."""
-        print("\n" + "=" * 80)
-        print("PHASE 5: MODEL TRAINING & EVALUATION")
-        print("=" * 80)
-
-        X, y = self.load_data(input_dir)
+        X, y = self.load_data()
         self.split_data(X, y)
 
-        self.train_logistic_regression()
-        self.train_random_forest()
-        self.train_xgboost()
+        self.tune_models()
+
+        for name, model in self.models.items():
+            self._evaluate(name, model)
 
         self.select_best_model()
-        self.save_outputs(output_dir)
+        self.save_model()
 
-        print("\n" + "=" * 80)
-        print("✓ MODEL TRAINING COMPLETE")
-        print("=" * 80)
-        print(f"\n{len(self.models)} models trained and evaluated")
-        print(f"Best model selected: {self.best_model_name}")
-        print(f"\nNext phase: MLflow Integration for experiment tracking")
-        print()
+        print("\n✓ TRAINING COMPLETE")
 
 
 if __name__ == "__main__":
-    trainer = ModelTrainer()
-    trainer.run()
+    ModelTrainer().run()

@@ -1,0 +1,67 @@
+[2026-06-07T17:39:17.923+0545] {processor.py:161} INFO - Started process (PID=31862) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:39:17.924+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py for tasks to queue
+[2026-06-07T17:39:17.927+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:39:17.926+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:39:17.933+0545] {processor.py:840} INFO - DAG(s) 'latest_only' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:39:18.429+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:39:18.427+0545] {override.py:1858} INFO - Created Permission View: can edit on DAG:latest_only
+[2026-06-07T17:39:18.604+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:39:18.603+0545] {override.py:1858} INFO - Created Permission View: can read on DAG:latest_only
+[2026-06-07T17:39:18.753+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:39:18.752+0545] {override.py:1858} INFO - Created Permission View: can delete on DAG:latest_only
+[2026-06-07T17:39:18.753+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:39:18.753+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:39:18.762+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:39:18.762+0545] {dag.py:3111} INFO - Creating ORM DAG for latest_only
+[2026-06-07T17:39:18.767+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:39:18.767+0545] {dag.py:3947} INFO - Setting next_dagrun for latest_only to 2026-06-07 04:00:00+00:00, run_after=2026-06-07 08:00:00+00:00
+[2026-06-07T17:39:19.021+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py took 1.105 seconds
+[2026-06-07T17:40:47.001+0545] {processor.py:161} INFO - Started process (PID=32049) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:40:47.027+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py for tasks to queue
+[2026-06-07T17:40:47.030+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:40:47.030+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:40:47.039+0545] {processor.py:840} INFO - DAG(s) 'latest_only' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:40:47.061+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:40:47.061+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:40:47.077+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:40:47.077+0545] {dag.py:3947} INFO - Setting next_dagrun for latest_only to 2026-06-07 04:00:00+00:00, run_after=2026-06-07 08:00:00+00:00
+[2026-06-07T17:40:47.262+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py took 0.277 seconds
+[2026-06-07T17:41:56.651+0545] {processor.py:161} INFO - Started process (PID=32208) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:41:56.653+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py for tasks to queue
+[2026-06-07T17:41:56.656+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:41:56.655+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:41:56.664+0545] {processor.py:840} INFO - DAG(s) 'latest_only' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:41:56.680+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:41:56.680+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:41:56.695+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:41:56.695+0545] {dag.py:3947} INFO - Setting next_dagrun for latest_only to 2026-06-07 04:00:00+00:00, run_after=2026-06-07 08:00:00+00:00
+[2026-06-07T17:41:56.881+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py took 0.240 seconds
+[2026-06-07T17:43:10.564+0545] {processor.py:161} INFO - Started process (PID=32508) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:43:10.566+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py for tasks to queue
+[2026-06-07T17:43:10.570+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:43:10.569+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:43:10.578+0545] {processor.py:840} INFO - DAG(s) 'latest_only' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:43:10.592+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:43:10.592+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:43:10.607+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:43:10.606+0545] {dag.py:3947} INFO - Setting next_dagrun for latest_only to 2026-06-07 04:00:00+00:00, run_after=2026-06-07 08:00:00+00:00
+[2026-06-07T17:43:10.858+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py took 0.308 seconds
+[2026-06-07T17:44:23.159+0545] {processor.py:161} INFO - Started process (PID=33057) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:44:23.176+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py for tasks to queue
+[2026-06-07T17:44:23.178+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:44:23.177+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:44:23.181+0545] {processor.py:840} INFO - DAG(s) 'latest_only' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:44:23.192+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:44:23.192+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:44:23.206+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:44:23.206+0545] {dag.py:3947} INFO - Setting next_dagrun for latest_only to 2026-06-07 04:00:00+00:00, run_after=2026-06-07 08:00:00+00:00
+[2026-06-07T17:44:23.406+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py took 0.251 seconds
+[2026-06-07T17:45:33.464+0545] {processor.py:161} INFO - Started process (PID=33211) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:45:33.465+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py for tasks to queue
+[2026-06-07T17:45:33.467+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:45:33.466+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:45:33.471+0545] {processor.py:840} INFO - DAG(s) 'latest_only' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:45:33.485+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:45:33.484+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:45:33.499+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:45:33.499+0545] {dag.py:3947} INFO - Setting next_dagrun for latest_only to 2026-06-07 08:00:00+00:00, run_after=2026-06-07 12:00:00+00:00
+[2026-06-07T17:45:33.696+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py took 0.237 seconds
+[2026-06-07T17:47:58.260+0545] {processor.py:161} INFO - Started process (PID=33411) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:47:58.324+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py for tasks to queue
+[2026-06-07T17:47:58.325+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:47:58.325+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:47:58.329+0545] {processor.py:840} INFO - DAG(s) 'latest_only' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:47:58.341+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:47:58.341+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:47:58.452+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:47:58.452+0545] {dag.py:3947} INFO - Setting next_dagrun for latest_only to 2026-06-07 08:00:00+00:00, run_after=2026-06-07 12:00:00+00:00
+[2026-06-07T17:47:58.620+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py took 0.365 seconds
+[2026-06-07T17:49:16.939+0545] {processor.py:161} INFO - Started process (PID=33608) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:49:16.941+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py for tasks to queue
+[2026-06-07T17:49:16.946+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:49:16.945+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:49:16.953+0545] {processor.py:840} INFO - DAG(s) 'latest_only' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:49:16.969+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:49:16.968+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:49:16.983+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:49:16.983+0545] {dag.py:3947} INFO - Setting next_dagrun for latest_only to 2026-06-07 08:00:00+00:00, run_after=2026-06-07 12:00:00+00:00
+[2026-06-07T17:49:17.204+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py took 0.280 seconds
+[2026-06-07T17:50:25.849+0545] {processor.py:161} INFO - Started process (PID=33703) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:50:25.876+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py for tasks to queue
+[2026-06-07T17:50:25.877+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:50:25.877+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:50:25.886+0545] {processor.py:840} INFO - DAG(s) 'latest_only' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py
+[2026-06-07T17:50:25.905+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:50:25.905+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:50:25.929+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:50:25.929+0545] {dag.py:3947} INFO - Setting next_dagrun for latest_only to 2026-06-07 08:00:00+00:00, run_after=2026-06-07 12:00:00+00:00
+[2026-06-07T17:50:26.141+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_latest_only.py took 0.297 seconds

@@ -1,0 +1,88 @@
+[2026-06-07T17:38:27.024+0545] {processor.py:161} INFO - Started process (PID=31805) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:38:27.025+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py for tasks to queue
+[2026-06-07T17:38:27.029+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:38:27.028+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:38:27.046+0545] {processor.py:840} INFO - DAG(s) 'example_xcom_args_with_operators', 'example_xcom_args' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:38:27.636+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:38:27.635+0545] {override.py:1858} INFO - Created Permission View: can edit on DAG:example_xcom_args_with_operators
+[2026-06-07T17:38:27.795+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:38:27.795+0545] {override.py:1858} INFO - Created Permission View: can read on DAG:example_xcom_args_with_operators
+[2026-06-07T17:38:27.988+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:38:27.987+0545] {override.py:1858} INFO - Created Permission View: can delete on DAG:example_xcom_args_with_operators
+[2026-06-07T17:38:28.399+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:38:28.398+0545] {override.py:1858} INFO - Created Permission View: can edit on DAG:example_xcom_args
+[2026-06-07T17:38:28.582+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:38:28.581+0545] {override.py:1858} INFO - Created Permission View: can read on DAG:example_xcom_args
+[2026-06-07T17:38:28.750+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:38:28.749+0545] {override.py:1858} INFO - Created Permission View: can delete on DAG:example_xcom_args
+[2026-06-07T17:38:28.751+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:38:28.751+0545] {dag.py:3089} INFO - Sync 2 DAGs
+[2026-06-07T17:38:28.777+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:38:28.776+0545] {dag.py:3111} INFO - Creating ORM DAG for example_xcom_args_with_operators
+[2026-06-07T17:38:28.778+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:38:28.778+0545] {dag.py:3111} INFO - Creating ORM DAG for example_xcom_args
+[2026-06-07T17:38:28.779+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:38:28.779+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args to None, run_after=None
+[2026-06-07T17:38:28.780+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:38:28.780+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args_with_operators to None, run_after=None
+[2026-06-07T17:38:28.951+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py took 1.938 seconds
+[2026-06-07T17:40:15.188+0545] {processor.py:161} INFO - Started process (PID=31986) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:40:15.212+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py for tasks to queue
+[2026-06-07T17:40:15.214+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:40:15.214+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:40:15.324+0545] {processor.py:840} INFO - DAG(s) 'example_xcom_args_with_operators', 'example_xcom_args' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:40:15.338+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:40:15.338+0545] {dag.py:3089} INFO - Sync 2 DAGs
+[2026-06-07T17:40:15.347+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:40:15.347+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args to None, run_after=None
+[2026-06-07T17:40:15.350+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:40:15.349+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args_with_operators to None, run_after=None
+[2026-06-07T17:40:15.511+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py took 0.328 seconds
+[2026-06-07T17:41:07.086+0545] {processor.py:161} INFO - Started process (PID=32098) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:41:07.088+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py for tasks to queue
+[2026-06-07T17:41:07.093+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:41:07.091+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:41:07.105+0545] {processor.py:840} INFO - DAG(s) 'example_xcom_args_with_operators', 'example_xcom_args' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:41:07.121+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:41:07.121+0545] {dag.py:3089} INFO - Sync 2 DAGs
+[2026-06-07T17:41:07.130+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:41:07.130+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args to None, run_after=None
+[2026-06-07T17:41:07.133+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:41:07.133+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args_with_operators to None, run_after=None
+[2026-06-07T17:41:07.324+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py took 0.252 seconds
+[2026-06-07T17:42:17.700+0545] {processor.py:161} INFO - Started process (PID=32262) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:42:17.705+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py for tasks to queue
+[2026-06-07T17:42:17.706+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:42:17.706+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:42:17.714+0545] {processor.py:840} INFO - DAG(s) 'example_xcom_args', 'example_xcom_args_with_operators' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:42:17.730+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:42:17.730+0545] {dag.py:3089} INFO - Sync 2 DAGs
+[2026-06-07T17:42:17.739+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:42:17.739+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args to None, run_after=None
+[2026-06-07T17:42:17.743+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:42:17.743+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args_with_operators to None, run_after=None
+[2026-06-07T17:42:17.931+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py took 0.238 seconds
+[2026-06-07T17:43:32.156+0545] {processor.py:161} INFO - Started process (PID=32922) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:43:32.157+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py for tasks to queue
+[2026-06-07T17:43:32.159+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:43:32.159+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:43:32.167+0545] {processor.py:840} INFO - DAG(s) 'example_xcom_args_with_operators', 'example_xcom_args' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:43:32.182+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:43:32.182+0545] {dag.py:3089} INFO - Sync 2 DAGs
+[2026-06-07T17:43:32.190+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:43:32.190+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args to None, run_after=None
+[2026-06-07T17:43:32.192+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:43:32.192+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args_with_operators to None, run_after=None
+[2026-06-07T17:43:32.388+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py took 0.238 seconds
+[2026-06-07T17:44:41.020+0545] {processor.py:161} INFO - Started process (PID=33095) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:44:41.021+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py for tasks to queue
+[2026-06-07T17:44:41.023+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:44:41.022+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:44:41.030+0545] {processor.py:840} INFO - DAG(s) 'example_xcom_args', 'example_xcom_args_with_operators' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:44:41.045+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:44:41.045+0545] {dag.py:3089} INFO - Sync 2 DAGs
+[2026-06-07T17:44:41.054+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:44:41.054+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args to None, run_after=None
+[2026-06-07T17:44:41.056+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:44:41.056+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args_with_operators to None, run_after=None
+[2026-06-07T17:44:41.218+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py took 0.203 seconds
+[2026-06-07T17:46:40.336+0545] {processor.py:161} INFO - Started process (PID=33290) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:46:40.337+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py for tasks to queue
+[2026-06-07T17:46:40.338+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:46:40.338+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:46:40.349+0545] {processor.py:840} INFO - DAG(s) 'example_xcom_args', 'example_xcom_args_with_operators' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:46:40.371+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:46:40.371+0545] {dag.py:3089} INFO - Sync 2 DAGs
+[2026-06-07T17:46:40.379+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:46:40.379+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args to None, run_after=None
+[2026-06-07T17:46:40.381+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:46:40.381+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args_with_operators to None, run_after=None
+[2026-06-07T17:46:40.603+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py took 0.271 seconds
+[2026-06-07T17:47:30.061+0545] {processor.py:161} INFO - Started process (PID=33374) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:47:30.090+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py for tasks to queue
+[2026-06-07T17:47:30.092+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:47:30.091+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:47:30.101+0545] {processor.py:840} INFO - DAG(s) 'example_xcom_args', 'example_xcom_args_with_operators' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:47:30.123+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:47:30.123+0545] {dag.py:3089} INFO - Sync 2 DAGs
+[2026-06-07T17:47:30.132+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:47:30.131+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args to None, run_after=None
+[2026-06-07T17:47:30.134+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:47:30.134+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args_with_operators to None, run_after=None
+[2026-06-07T17:47:30.302+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py took 0.244 seconds
+[2026-06-07T17:48:36.200+0545] {processor.py:161} INFO - Started process (PID=33508) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:48:36.230+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py for tasks to queue
+[2026-06-07T17:48:36.235+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:48:36.234+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:48:36.258+0545] {processor.py:840} INFO - DAG(s) 'example_xcom_args_with_operators', 'example_xcom_args' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:48:36.277+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:48:36.277+0545] {dag.py:3089} INFO - Sync 2 DAGs
+[2026-06-07T17:48:36.286+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:48:36.286+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args to None, run_after=None
+[2026-06-07T17:48:36.288+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:48:36.288+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args_with_operators to None, run_after=None
+[2026-06-07T17:48:36.437+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py took 0.252 seconds
+[2026-06-07T17:49:47.441+0545] {processor.py:161} INFO - Started process (PID=33659) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:49:47.442+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py for tasks to queue
+[2026-06-07T17:49:47.444+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:49:47.444+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:49:47.456+0545] {processor.py:840} INFO - DAG(s) 'example_xcom_args_with_operators', 'example_xcom_args' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py
+[2026-06-07T17:49:47.470+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:49:47.470+0545] {dag.py:3089} INFO - Sync 2 DAGs
+[2026-06-07T17:49:47.478+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:49:47.478+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args to None, run_after=None
+[2026-06-07T17:49:47.481+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:49:47.481+0545] {dag.py:3947} INFO - Setting next_dagrun for example_xcom_args_with_operators to None, run_after=None
+[2026-06-07T17:49:47.666+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/example_xcomargs.py took 0.236 seconds

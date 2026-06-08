@@ -1,0 +1,81 @@
+[2026-06-07T17:36:17.290+0545] {processor.py:161} INFO - Started process (PID=31666) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:36:17.291+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py for tasks to queue
+[2026-06-07T17:36:17.292+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:36:17.292+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:36:17.299+0545] {processor.py:840} INFO - DAG(s) 'tutorial_taskflow_api' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:36:17.730+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:36:17.730+0545] {override.py:1858} INFO - Created Permission View: can read on DAG:tutorial_taskflow_api
+[2026-06-07T17:36:17.890+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:36:17.889+0545] {override.py:1858} INFO - Created Permission View: can edit on DAG:tutorial_taskflow_api
+[2026-06-07T17:36:18.056+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:36:18.056+0545] {override.py:1858} INFO - Created Permission View: can delete on DAG:tutorial_taskflow_api
+[2026-06-07T17:36:18.057+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:36:18.056+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:36:18.158+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:36:18.158+0545] {dag.py:3111} INFO - Creating ORM DAG for tutorial_taskflow_api
+[2026-06-07T17:36:18.159+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:36:18.159+0545] {dag.py:3947} INFO - Setting next_dagrun for tutorial_taskflow_api to None, run_after=None
+[2026-06-07T17:36:18.337+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py took 1.051 seconds
+[2026-06-07T17:38:21.997+0545] {processor.py:161} INFO - Started process (PID=31795) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:38:22.019+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py for tasks to queue
+[2026-06-07T17:38:22.020+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:38:22.020+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:38:22.025+0545] {processor.py:840} INFO - DAG(s) 'tutorial_taskflow_api' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:38:22.040+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:38:22.040+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:38:22.049+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:38:22.049+0545] {dag.py:3947} INFO - Setting next_dagrun for tutorial_taskflow_api to None, run_after=None
+[2026-06-07T17:38:22.241+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py took 0.247 seconds
+[2026-06-07T17:40:10.087+0545] {processor.py:161} INFO - Started process (PID=31977) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:40:10.113+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py for tasks to queue
+[2026-06-07T17:40:10.115+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:40:10.115+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:40:10.228+0545] {processor.py:840} INFO - DAG(s) 'tutorial_taskflow_api' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:40:10.240+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:40:10.240+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:40:10.250+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:40:10.250+0545] {dag.py:3947} INFO - Setting next_dagrun for tutorial_taskflow_api to None, run_after=None
+[2026-06-07T17:40:10.391+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py took 0.309 seconds
+[2026-06-07T17:41:02.547+0545] {processor.py:161} INFO - Started process (PID=32089) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:41:02.576+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py for tasks to queue
+[2026-06-07T17:41:02.578+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:41:02.578+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:41:02.589+0545] {processor.py:840} INFO - DAG(s) 'tutorial_taskflow_api' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:41:02.610+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:41:02.610+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:41:02.619+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:41:02.619+0545] {dag.py:3947} INFO - Setting next_dagrun for tutorial_taskflow_api to None, run_after=None
+[2026-06-07T17:41:02.795+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py took 0.256 seconds
+[2026-06-07T17:42:12.708+0545] {processor.py:161} INFO - Started process (PID=32253) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:42:12.740+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py for tasks to queue
+[2026-06-07T17:42:12.744+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:42:12.743+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:42:12.763+0545] {processor.py:840} INFO - DAG(s) 'tutorial_taskflow_api' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:42:12.783+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:42:12.783+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:42:12.793+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:42:12.792+0545] {dag.py:3947} INFO - Setting next_dagrun for tutorial_taskflow_api to None, run_after=None
+[2026-06-07T17:42:12.975+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py took 0.277 seconds
+[2026-06-07T17:43:27.748+0545] {processor.py:161} INFO - Started process (PID=32913) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:43:27.749+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py for tasks to queue
+[2026-06-07T17:43:27.750+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:43:27.750+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:43:27.755+0545] {processor.py:840} INFO - DAG(s) 'tutorial_taskflow_api' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:43:27.768+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:43:27.768+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:43:27.777+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:43:27.777+0545] {dag.py:3947} INFO - Setting next_dagrun for tutorial_taskflow_api to None, run_after=None
+[2026-06-07T17:43:27.989+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py took 0.247 seconds
+[2026-06-07T17:44:36.271+0545] {processor.py:161} INFO - Started process (PID=33086) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:44:36.272+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py for tasks to queue
+[2026-06-07T17:44:36.273+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:44:36.273+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:44:36.279+0545] {processor.py:840} INFO - DAG(s) 'tutorial_taskflow_api' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:44:36.291+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:44:36.291+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:44:36.299+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:44:36.299+0545] {dag.py:3947} INFO - Setting next_dagrun for tutorial_taskflow_api to None, run_after=None
+[2026-06-07T17:44:36.481+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py took 0.215 seconds
+[2026-06-07T17:46:35.358+0545] {processor.py:161} INFO - Started process (PID=33255) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:46:35.360+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py for tasks to queue
+[2026-06-07T17:46:35.364+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:46:35.363+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:46:35.377+0545] {processor.py:840} INFO - DAG(s) 'tutorial_taskflow_api' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:46:35.396+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:46:35.395+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:46:35.405+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:46:35.405+0545] {dag.py:3947} INFO - Setting next_dagrun for tutorial_taskflow_api to None, run_after=None
+[2026-06-07T17:46:35.604+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py took 0.259 seconds
+[2026-06-07T17:47:25.087+0545] {processor.py:161} INFO - Started process (PID=33338) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:47:25.088+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py for tasks to queue
+[2026-06-07T17:47:25.091+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:47:25.090+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:47:25.105+0545] {processor.py:840} INFO - DAG(s) 'tutorial_taskflow_api' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:47:25.126+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:47:25.126+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:47:25.135+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:47:25.135+0545] {dag.py:3947} INFO - Setting next_dagrun for tutorial_taskflow_api to None, run_after=None
+[2026-06-07T17:47:25.329+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py took 0.251 seconds
+[2026-06-07T17:48:30.485+0545] {processor.py:161} INFO - Started process (PID=33504) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:48:30.486+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py for tasks to queue
+[2026-06-07T17:48:30.488+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:48:30.487+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:48:30.493+0545] {processor.py:840} INFO - DAG(s) 'tutorial_taskflow_api' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:48:30.507+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:48:30.507+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:48:30.516+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:48:30.516+0545] {dag.py:3947} INFO - Setting next_dagrun for tutorial_taskflow_api to None, run_after=None
+[2026-06-07T17:48:30.705+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py took 0.224 seconds
+[2026-06-07T17:49:41.943+0545] {processor.py:161} INFO - Started process (PID=33655) to work on /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:49:41.970+0545] {processor.py:830} INFO - Processing file /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py for tasks to queue
+[2026-06-07T17:49:41.973+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:49:41.972+0545] {dagbag.py:545} INFO - Filling up the DagBag from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:49:41.985+0545] {processor.py:840} INFO - DAG(s) 'tutorial_taskflow_api' retrieved from /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py
+[2026-06-07T17:49:42.007+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:49:42.007+0545] {dag.py:3089} INFO - Sync 1 DAGs
+[2026-06-07T17:49:42.017+0545] {logging_mixin.py:188} INFO - [2026-06-07T17:49:42.017+0545] {dag.py:3947} INFO - Setting next_dagrun for tutorial_taskflow_api to None, run_after=None
+[2026-06-07T17:49:42.189+0545] {processor.py:183} INFO - Processing /home/suyog/miniconda3/envs/fraud_mlops/lib/python3.11/site-packages/airflow/example_dags/tutorial_taskflow_api.py took 0.256 seconds

@@ -15,7 +15,7 @@ repo_root = Path('/home/suyog/Desktop/A_space/MLOPS/Final_Project/Fraud_Detectio
 sys.path.insert(0, str(repo_root))
 
 # Import pipeline modules
-from src.ingestion.prepare_dataset import main as prepare_dataset_main
+from src.ingestion.prepare_dataset import prepare_dataset as prepare_dataset_main
 from src.ingestion.load_to_mariadb import load_processed_csv
 from src.preprocessing.preprocess import PreprocessingPipeline
 from src.feature_engineering.engineer_features import FeatureEngineer
@@ -34,7 +34,7 @@ default_args = {
 def task_prepare_dataset():
     """Phase 1: Prepare raw dataset for ingestion"""
     print("[DAG] Starting: Prepare Dataset")
-    prepare_dataset_main()
+    prepare_dataset_main(repo_root)
     print("[DAG] Complete: Prepare Dataset")
 
 def task_load_to_mariadb():
@@ -64,10 +64,7 @@ def task_train_models():
     """Phase 5: Train and evaluate models"""
     print("[DAG] Starting: Model Training")
     trainer = ModelTrainer()
-    trainer.run(
-        input_dir=repo_root / "data" / "engineered_features",
-        output_dir=repo_root / "models" / "trained_models"
-    )
+    trainer.run()
     print("[DAG] Complete: Model Training")
 
 def task_mlflow_log():
@@ -128,3 +125,4 @@ with DAG(
 
     # DAG ordering (pipeline dependencies)
     t1_prepare >> t2_load >> t3_preprocess >> t4_features >> t5_train >> t6_mlflow
+
