@@ -11,7 +11,7 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 
 # Set up repository path
-repo_root = Path('/home/suyog/Desktop/A_space/MLOPS/Final_Project/Fraud_Detection_MLOps')
+repo_root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(repo_root))
 
 # Import pipeline modules
