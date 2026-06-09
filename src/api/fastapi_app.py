@@ -1,370 +1,195 @@
 """
-FastAPI Backend for Fraud Detection Model Serving
-Phase 8A: REST API for real-time fraud predictions
+Phase 7: FastAPI Prediction API
 """
-
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
 from pathlib import Path
-import pickle
+import sys
+import json
+import time
 import joblib
+import warnings
+warnings.filterwarnings('ignore')
 import numpy as np
 import pandas as pd
-import sys
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
+from typing import List, Optional
+import uvicorn
 
-# Add repo to path
 repo_root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(repo_root))
 
-from src.preprocessing.preprocess import PreprocessingPipeline
-from src.feature_engineering.engineer_features import FeatureEngineer
-
-# Initialize FastAPI app
 app = FastAPI(
     title="Fraud Detection API",
-    description="Real-time fraud detection for financial transactions",
-    version="1.0.0"
+    description="MLOps fraud detection using PaySim dataset",
+    version="2.0.0"
 )
 
-# Enable CORS for Streamlit frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
 )
 
-# Load trained model and transformers at startup
-MODEL_PATH = repo_root / "models" / "trained_models" / "best_model.pkl"
-SCALER_PATH = repo_root / "models" / "trained_models" / "scaler.pkl"
-
-try:
-    with open(MODEL_PATH, 'rb') as f:
-        model = pickle.load(f)
-    scaler = pickle.load(open(SCALER_PATH, 'rb'))
-    print(f"✓ Model loaded: {MODEL_PATH}")
-except Exception as e:
-    print(f"✗ Failed to load model: {e}")
-    model = None
-    scaler = None
-
-# Request/Response schemas
-class TransactionInput(BaseModel):
-    """Input schema for fraud prediction"""
-    step: int = Field(..., description="Transaction step sequence")
-    amount: float = Field(..., description="Transaction amount")
-    oldbalanceOrg: float = Field(..., description="Sender's balance before transaction")
-    newbalanceOrig: float = Field(..., description="Sender's balance after transaction")
-    oldbalanceDest: float = Field(..., description="Receiver's balance before transaction")
-    newbalanceDest: float = Field(..., description="Receiver's balance after transaction")
-    type: str = Field(..., description="Transaction type: PAYMENT, TRANSFER, CASH_OUT, CASH_IN, DEBIT")
-    acct_type: str = Field(..., description="Account type: Current or Savings")
-    branch: int = Field(..., description="Branch ID (0-134)")
-    unusuallogin: int = Field(default=0, description="Unusual login score")
-    isFlaggedFraud: int = Field(default=0, description="System fraud flag (0 or 1)")
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "step": 1,
-                "amount": 9839.64,
-                "oldbalanceOrg": 170136.00,
-                "newbalanceOrig": 160296.36,
-                "oldbalanceDest": 0.00,
-                "newbalanceDest": 0.00,
-                "type": "PAYMENT",
-                "acct_type": "Current",
-                "branch": 50,
-                "unusuallogin": 5,
-                "isFlaggedFraud": 0
-            }
-        }
-
-class PredictionResponse(BaseModel):
-    """Output schema for fraud prediction"""
-    is_fraud: bool = Field(..., description="Fraud prediction (True/False)")
-    fraud_probability: float = Field(..., description="Probability of fraud (0-1)")
-    fraud_confidence: float = Field(..., description="Confidence score (0-100)")
-    risk_level: str = Field(..., description="Risk category: Low, Medium, High")
-
-# Helper functions
-def prepare_features(transaction: TransactionInput) -> np.ndarray:
-    """
-    Convert raw transaction input to 34 model features.
-    Replicates full preprocessing from Phase 3 & 4.
-    """
-    # === Phase 3 + 4 Feature Processing ===
-    
-    # Basic transaction dict
-    tx_dict = transaction.dict()
-    
-    # ===== INPUT FEATURES (16) =====
-    features = []
-    
-    # 1-7: Numeric features (will be scaled later)
-    numeric_cols = ['step', 'amount', 'oldbalanceOrg', 'newbalanceOrig',
-                    'oldbalanceDest', 'newbalanceDest', 'unusuallogin']
-    numeric_features = np.array([tx_dict[col] for col in numeric_cols], dtype=float)
-    
-    # 8: isFlaggedFraud
-    features.append(tx_dict['isFlaggedFraud'])
-    
-    # 9-13: One-hot encode transaction type (5 features)
-    type_mapping = {'CASH_IN': 0, 'CASH_OUT': 1, 'DEBIT': 2, 'PAYMENT': 3, 'TRANSFER': 4}
-    tx_type_idx = type_mapping.get(tx_dict['type'], 0)
-    tx_type_encoded = [1.0 if i == tx_type_idx else 0.0 for i in range(5)]
-    features.extend(tx_type_encoded)
-    
-    # 14-15: One-hot encode account type (2 features)
-    acct_type_idx = 0 if tx_dict['acct_type'] == 'Current' else 1
-    acct_type_encoded = [1.0 if i == acct_type_idx else 0.0 for i in range(2)]
-    features.extend(acct_type_encoded)
-    
-    # 16: Branch fraud rate (mock: use branch ID as proxy)
-    branch_id = tx_dict['branch']
-    branch_fraud_rate = (branch_id % 100) / 100.0
-    features.append(branch_fraud_rate)
-    
-    # Build unscaled input features (16 total)
-    input_features = np.concatenate([
-        numeric_features,
-        np.array(features, dtype=float)
-    ])
-    
-    # ===== ENGINEERED FEATURES (18) =====
-    engineered = []
-    
-    # Balance-based features
-    sender_balance_change = tx_dict['newbalanceOrig'] - tx_dict['oldbalanceOrg']
-    receiver_balance_change = tx_dict['newbalanceDest'] - tx_dict['oldbalanceDest']
-    
-    engineered.append(sender_balance_change)  # 17
-    engineered.append(receiver_balance_change)  # 18
-    engineered.append(abs(sender_balance_change))  # 19
-    engineered.append(abs(receiver_balance_change))  # 20
-    
-    # Balance change ratios
-    sender_balance_ratio = sender_balance_change / (abs(tx_dict['oldbalanceOrg']) + 1e-10)
-    receiver_balance_ratio = receiver_balance_change / (abs(tx_dict['oldbalanceDest']) + 1e-10)
-    
-    engineered.append(sender_balance_ratio)  # 21
-    engineered.append(receiver_balance_ratio)  # 22
-    
-    # Amount ratios
-    amount_ratio_sender = tx_dict['amount'] / (abs(tx_dict['oldbalanceOrg']) + 1e-10)
-    amount_ratio_receiver = tx_dict['amount'] / (abs(tx_dict['oldbalanceDest']) + 1e-10)
-    
-    engineered.append(amount_ratio_sender)  # 23
-    engineered.append(amount_ratio_receiver)  # 24
-    
-    # Suspicious behavior flags
-    sender_depletes = 1.0 if sender_balance_change < 0 and abs(sender_balance_change) > tx_dict['amount'] * 0.9 else 0.0
-    receiver_zero = 1.0 if tx_dict['oldbalanceDest'] < 1.0 else 0.0
-    high_value = 1.0 if tx_dict['amount'] > np.percentile([100000], 95) else 0.0  # Simple heuristic
-    
-    engineered.append(sender_depletes)  # 25
-    engineered.append(receiver_zero)   # 26
-    engineered.append(high_value)      # 27
-    
-    # Interaction features
-    current_to_savings = 1.0 if (tx_type_idx == 3 and acct_type_idx == 1) else 0.0  # PAYMENT to Savings
-    cashout_unusual = 1.0 if (tx_type_idx == 1 and tx_dict['unusuallogin'] > 50) else 0.0  # CASH_OUT + unusual
-    
-    engineered.append(current_to_savings)  # 28
-    engineered.append(cashout_unusual)  # 29
-    
-    # Complex signals
-    high_fraud_branch = 1.0 if (branch_id % 10 < 3 and tx_dict['amount'] > 50000) else 0.0
-    flagged_and_unusual = float(tx_dict['isFlaggedFraud'] and tx_dict['unusuallogin'] > 50)
-    
-    engineered.append(high_fraud_branch)  # 30
-    engineered.append(flagged_and_unusual)  # 31
-    
-    # Suspicion and risk scores
-    suspicion_score = (
-        sender_depletes * 0.3 +
-        receiver_zero * 0.1 +
-        high_value * 0.2 +
-        current_to_savings * 0.15 +
-        cashout_unusual * 0.25
-    )
-    
-    risk_exposure_sender = abs(sender_balance_change) + (amount_ratio_sender * 0.1)
-    total_money_flow = abs(sender_balance_change) + abs(receiver_balance_change)
-    
-    engineered.append(suspicion_score)  # 32
-    engineered.append(risk_exposure_sender)  # 33
-    engineered.append(total_money_flow)  # 34
-    
-    # Combine all 34 features (unscaled)
-    all_features = np.concatenate([input_features, np.array(engineered, dtype=float)])
-    
-    # Scale all 34 features using the model's scaler
-    features_scaled = scaler.transform(all_features.reshape(1, -1))
-    
-    return features_scaled
-
-def get_risk_level(fraud_prob: float) -> str:
-    """Classify fraud probability into risk levels"""
-    if fraud_prob < 0.3:
-        return "Low"
-    elif fraud_prob < 0.7:
-        return "Medium"
-    else:
-        return "High"
-
-# API Endpoints
-@app.get("/")
-def read_root():
-    """Health check endpoint"""
-    return {
-        "status": "✓ Fraud Detection API is running",
-        "version": "1.0.0",
-        "model_loaded": model is not None
-    }
-
-@app.post("/predict", response_model=PredictionResponse)
-def predict_fraud(transaction: TransactionInput):
-    """
-    Predict if a transaction is fraudulent.
-    
-    Returns:
-    - is_fraud: Boolean prediction
-    - fraud_probability: Confidence (0-1)
-    - fraud_confidence: Percentage (0-100)
-    - risk_level: Low/Medium/High
-    """
-    if model is None:
-        raise HTTPException(status_code=500, detail="Model not loaded")
-
-    try:
-        # Prepare features
-        features = prepare_features(transaction)
-
-        # Get prediction
-        prediction = model.predict(features)[0]  # 0 = legit, 1 = fraud
-        fraud_probability = model.predict_proba(features)[0][1]  # Probability of fraud
-
-        # Determine fraud and risk level
-        is_fraud = bool(prediction == 1)
-        fraud_confidence = float(fraud_probability * 100)
-        risk_level = get_risk_level(fraud_probability)
-
-        return PredictionResponse(
-            is_fraud=is_fraud,
-            fraud_probability=float(fraud_probability),
-            fraud_confidence=fraud_confidence,
-            risk_level=risk_level
-        )
-
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Prediction error: {str(e)}")
-
-@app.post("/batch_predict")
-def batch_predict(transactions: list[TransactionInput]):
-    """
-    Predict fraud for multiple transactions.
-    
-    Returns list of predictions with counts.
-    """
-    if model is None:
-        raise HTTPException(status_code=500, detail="Model not loaded")
-
-    results = []
-    for tx in transactions:
-        try:
-            features = prepare_features(tx)
-            prediction = model.predict(features)[0]
-            fraud_probability = model.predict_proba(features)[0][1]
-            
-            results.append({
-                "is_fraud": bool(prediction == 1),
-                "fraud_probability": float(fraud_probability),
-                "fraud_confidence": float(fraud_probability * 100),
-                "risk_level": get_risk_level(fraud_probability)
-            })
-        except Exception as e:
-            results.append({
-                "is_fraud": False,
-                "fraud_probability": 0.0,
-                "fraud_confidence": 0.0,
-                "risk_level": "Unknown",
-                "error": str(e)
-            })
-
-    return results
-
-@app.get("/model-info")
-def get_model_info():
-    """Get information about the trained model"""
-    return {
-        "model_type": "Logistic Regression",
-        "training_date": "2026-06-06",
-        "recall": 0.7857,
-        "precision": 0.1549,
-        "roc_auc": 0.8738,
-        "fraud_threshold": 0.5,
-        "features": 34
-    }
-
-if __name__ == "__main__":
-    import uvicorn
-    print("\n" + "=" * 70)
-    print("PHASE 8A: FASTAPI BACKEND")
-    print("=" * 70)
-    print("\nStarting FastAPI server...")
-    print("API docs: http://127.0.0.1:8000/docs")
-    print("Redoc: http://127.0.0.1:8000/redoc")
-    print()
-    uvicorn.run(app, host="127.0.0.1", port=8000)
-
-
-# ─── Monitoring Middleware ────────────────────────────────────────────────────
-
-import time
-from fastapi import Request
-from collections import defaultdict
-
-# In-memory metrics store
-_metrics = {
+metrics_store = {
     "total_requests": 0,
-    "failed_requests": 0,
-    "total_response_time_ms": 0.0,
-    "endpoint_counts": defaultdict(int),
+    "total_predictions": 0,
+    "fraud_detected": 0,
+    "errors": 0,
+    "total_response_ms": 0.0,
 }
 
 @app.middleware("http")
-async def monitoring_middleware(request: Request, call_next):
-    """Track every request — count, timing, errors."""
+async def monitor(request: Request, call_next):
     start = time.time()
-    _metrics["total_requests"] += 1
-    _metrics["endpoint_counts"][request.url.path] += 1
-
     try:
         response = await call_next(request)
-        if response.status_code >= 400:
-            _metrics["failed_requests"] += 1
-        elapsed_ms = (time.time() - start) * 1000
-        _metrics["total_response_time_ms"] += elapsed_ms
+        metrics_store["total_requests"] += 1
+        metrics_store["total_response_ms"] += (time.time() - start) * 1000
         return response
-    except Exception as e:
-        _metrics["failed_requests"] += 1
-        raise e
+    except Exception:
+        metrics_store["errors"] += 1
+        raise
 
+MODELS_DIR = repo_root / "models" / "trained_models"
+
+def load_artifacts():
+    model  = joblib.load(MODELS_DIR / "best_model.pkl")
+    scaler = joblib.load(MODELS_DIR / "scaler.pkl")
+    feature_names = json.loads((MODELS_DIR / "feature_names.json").read_text())
+    meta_path = MODELS_DIR / "metadata.json"
+    meta = json.loads(meta_path.read_text()) if meta_path.exists() else {}
+    return model, scaler, feature_names, meta
+
+try:
+    model, scaler, feature_names, model_meta = load_artifacts()
+    print(f"✓ Model loaded: {model_meta.get('best_model', 'unknown')}")
+except Exception as e:
+    print(f"✗ Model load failed: {e}")
+    model, scaler, feature_names, model_meta = None, None, None, {}
+
+class Transaction(BaseModel):
+    step:           int   = Field(..., example=1)
+    type:           str   = Field(..., example="TRANSFER")
+    amount:         float = Field(..., example=9839.64)
+    oldbalanceOrg:  float = Field(..., example=170136.0)
+    newbalanceOrig: float = Field(..., example=160296.36)
+    oldbalanceDest: float = Field(..., example=0.0)
+    newbalanceDest: float = Field(..., example=0.0)
+
+class BatchRequest(BaseModel):
+    transactions: List[Transaction]
+
+def prepare(transactions: list) -> pd.DataFrame:
+    rows = [t.model_dump() for t in transactions]
+    df = pd.DataFrame(rows)
+
+    # Step 1: one-hot encode type (matches preprocess.py)
+    for t in ["CASH_IN", "CASH_OUT", "DEBIT", "PAYMENT", "TRANSFER"]:
+        df[f"type_{t}"] = (df["type"] == t).astype(int)
+
+    # Step 2: engineered features (matches engineer_features.py)
+    df["sender_balance_change"]    = df["oldbalanceOrg"]  - df["newbalanceOrig"]
+    df["receiver_balance_change"]  = df["newbalanceDest"] - df["oldbalanceDest"]
+    df["amount_ratio_sender"]      = np.where(
+        df["oldbalanceOrg"] > 0, df["amount"] / df["oldbalanceOrg"], 0)
+    df["amount_ratio_receiver"]    = np.where(
+        df["oldbalanceDest"] > 0, df["amount"] / df["oldbalanceDest"], 0)
+    df["sender_depletes_account"]  = (
+        (df["oldbalanceOrg"] > 0) & (df["newbalanceOrig"] == 0)).astype(int)
+    df["receiver_had_zero_balance"] = (df["oldbalanceDest"] == 0).astype(int)
+    df["is_transfer_or_cashout"]   = df["type"].isin(["TRANSFER","CASH_OUT"]).astype(int)
+    df["balance_mismatch_sender"]  = abs(df["sender_balance_change"] - df["amount"])
+    df["balance_mismatch_receiver"]= abs(df["receiver_balance_change"] - df["amount"])
+
+    # Step 3: drop non-numeric columns
+    df = df.drop(columns=["type"], errors="ignore")
+
+    # Step 4: align to exact feature order from training
+    for col in feature_names:
+        if col not in df.columns:
+            df[col] = 0
+    df = df[feature_names]
+
+    # Step 5: scale only the 6 numeric cols the scaler was fitted on
+    numeric_cols = ['step', 'amount', 'oldbalanceOrg', 'newbalanceOrig',
+                    'oldbalanceDest', 'newbalanceDest']
+    df[numeric_cols] = scaler.transform(df[numeric_cols])
+    return df
+
+@app.get("/")
+def root():
+    return {"status": "ok", "service": "Fraud Detection API", "version": "2.0.0"}
+
+@app.get("/health")
+def health():
+    return {"status": "healthy", "model_loaded": model is not None}
+
+@app.get("/model-info")
+def model_info():
+    return {
+        "best_model":    model_meta.get("best_model", "unknown"),
+        "feature_count": model_meta.get("feature_count", "unknown"),
+        "fraud_rate":    model_meta.get("fraud_rate_full", "unknown"),
+        "best_recall":   model_meta.get("best_recall", "unknown"),
+        "best_f1":       model_meta.get("best_f1", "unknown"),
+    }
+
+@app.post("/predict")
+def predict(tx: Transaction):
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model not loaded")
+    try:
+        df   = prepare([tx])
+        pred = int(model.predict(df)[0])
+        prob = float(model.predict_proba(df)[0][1])
+        metrics_store["total_predictions"] += 1
+        if pred == 1:
+            metrics_store["fraud_detected"] += 1
+        return {
+            "is_fraud":           pred,
+            "fraud_probability":  round(prob, 4),
+            "risk_level":         "HIGH" if prob > 0.7 else "MEDIUM" if prob > 0.4 else "LOW"
+        }
+    except Exception as e:
+        metrics_store["errors"] += 1
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/batch_predict")
+def batch_predict(req: BatchRequest):
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model not loaded")
+    try:
+        df    = prepare(req.transactions)
+        preds = model.predict(df).tolist()
+        probs = model.predict_proba(df)[:, 1].tolist()
+        metrics_store["total_predictions"] += len(preds)
+        metrics_store["fraud_detected"]    += sum(preds)
+        return {
+            "predictions": [
+                {
+                    "is_fraud":          int(p),
+                    "fraud_probability": round(pr, 4),
+                    "risk_level":        "HIGH" if pr > 0.7 else "MEDIUM" if pr > 0.4 else "LOW"
+                }
+                for p, pr in zip(preds, probs)
+            ],
+            "total":       len(preds),
+            "fraud_count": sum(preds)
+        }
+    except Exception as e:
+        metrics_store["errors"] += 1
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/metrics")
 def get_metrics():
-    """API monitoring metrics — open in browser to see stats."""
-    total = _metrics["total_requests"]
-    avg_response_ms = (
-        _metrics["total_response_time_ms"] / total if total > 0 else 0.0
-    )
+    total = metrics_store["total_predictions"]
     return {
-        "total_requests": total,
-        "failed_requests": _metrics["failed_requests"],
-        "success_rate_pct": round((total - _metrics["failed_requests"]) / total * 100, 2) if total > 0 else 100.0,
-        "avg_response_time_ms": round(avg_response_ms, 2),
-        "endpoint_counts": dict(_metrics["endpoint_counts"]),
+        **metrics_store,
+        "fraud_rate_live":  round(metrics_store["fraud_detected"] / total, 4) if total else 0,
+        "avg_response_ms":  round(metrics_store["total_response_ms"] /
+                            max(metrics_store["total_requests"], 1), 2),
     }
+
+if __name__ == "__main__":
+    uvicorn.run("fastapi_app:app", host="0.0.0.0", port=8000, reload=True)

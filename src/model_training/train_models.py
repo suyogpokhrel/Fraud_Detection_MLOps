@@ -1,296 +1,159 @@
 """
-Phase 5: Fraud Model Training (STABLE + BEST MODEL SELECTION)
+Phase 5: Model Training Pipeline
+Loads engineered features from Redis or CSV,
+trains XGBoost with class_weight handling,
+evaluates with cross-validation, saves best model.
 """
-
-import sys
 from pathlib import Path
-import numpy as np
-import pandas as pd
-import pickle
+import sys
 import json
+import joblib
 import warnings
-
-from imblearn.over_sampling import SMOTE
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
+warnings.filterwarnings('ignore')
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score, f1_score,
-    roc_auc_score, confusion_matrix, average_precision_score
-)
-
-try:
-    from xgboost import XGBClassifier
-    HAS_XGBOOST = True
-except ImportError:
-    HAS_XGBOOST = False
-
-warnings.filterwarnings("ignore")
+from sklearn.metrics import (precision_score, recall_score, f1_score,
+                             accuracy_score, roc_auc_score,
+                             average_precision_score, confusion_matrix)
+import xgboost as xgb
 
 repo_root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(repo_root))
-
+from src.cache.redis_client import load_dataframe, save_dataframe, save_json, load_json
 
 class ModelTrainer:
-
     def __init__(self):
-        self.X_train = None
-        self.X_test = None
-        self.y_train = None
-        self.y_test = None
-
-        self.models = {}
+        self.output_dir = repo_root / "models" / "trained_models"
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         self.results = {}
 
-        self.best_model_name = None
-        self.best_model = None
-
-        self.scaler = StandardScaler()
-
-    # =========================
-    # LOAD DATA
-    # =========================
     def load_data(self):
-
-        print("\n[1/6] Loading data...")
-
-        X = pd.read_csv(repo_root / "data" / "engineered_features" / "X_engineered.csv").values
-        y = pd.read_csv(repo_root / "data" / "engineered_features" / "y_engineered.csv").squeeze().values
-
-        print(f"✓ Shape: {X.shape}")
-        print(f"✓ Fraud rate: {100*y.mean():.2f}%")
-
+        print("Loading engineered features...")
+        X = load_dataframe("engineered_X")
+        y = load_dataframe("engineered_y")
+        if X is None:
+            X = pd.read_csv(repo_root / "data" / "engineered_features" / "X_engineered.csv")
+            y = pd.read_csv(repo_root / "data" / "engineered_features" / "y_engineered.csv").squeeze()
+            print("  Loaded from CSV (Redis miss)")
+        else:
+            y = y.squeeze()
+            print("  Loaded from Redis")
+        print(f"  X shape: {X.shape}, fraud rate: {y.mean():.4f}")
         return X, y
 
-    # =========================
-    # SPLIT + SMOTE
-    # =========================
-    def split_data(self, X, y):
+    def evaluate(self, model, X_test, y_test, name):
+        y_pred  = model.predict(X_test)
+        y_proba = model.predict_proba(X_test)[:, 1]
+        cm = confusion_matrix(y_test, y_pred)
+        tn, fp, fn, tp = cm.ravel()
+        metrics = {
+            "Precision": round(precision_score(y_test, y_pred, zero_division=0), 4),
+            "Recall":    round(recall_score(y_test, y_pred, zero_division=0), 4),
+            "F1":        round(f1_score(y_test, y_pred, zero_division=0), 4),
+            "Accuracy":  round(accuracy_score(y_test, y_pred), 4),
+            "ROC-AUC":   round(roc_auc_score(y_test, y_proba), 4),
+            "PR-AUC":    round(average_precision_score(y_test, y_proba), 4),
+            "TP": int(tp), "FP": int(fp), "FN": int(fn), "TN": int(tn)
+        }
+        print(f"  {name}: Precision={metrics['Precision']:.4f}  "
+              f"Recall={metrics['Recall']:.4f}  "
+              f"F1={metrics['F1']:.4f}  ROC-AUC={metrics['ROC-AUC']:.4f}")
+        return metrics
 
-        print("\n[2/6] Train-test split...")
+    def train(self, X, y):
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42, stratify=y)
+        print(f"  Train: {X_train.shape}, Test: {X_test.shape}")
+        print(f"  Fraud in train: {y_train.sum()}, test: {y_test.sum()}")
 
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
-            X, y,
-            test_size=0.2,
-            stratify=y,
-            random_state=42
-        )
+        scale_pos_weight = (y_train == 0).sum() / (y_train == 1).sum()
+        skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-        print(f"✓ Train: {len(self.X_train)} | Test: {len(self.X_test)}")
-
-        print("\n[2.1] Applying SMOTE...")
-
-        smote = SMOTE(
-            sampling_strategy=0.1,
-            random_state=42
-        )
-
-        self.X_train, self.y_train = smote.fit_resample(self.X_train, self.y_train)
-
-        self.X_train = self.X_train.astype(np.float32)
-        self.X_test = self.X_test.astype(np.float32)
-
-        self.X_train = self.scaler.fit_transform(self.X_train)
-        self.X_test = self.scaler.transform(self.X_test)
-
-    # =========================
-    # TUNING MODELS
-    # =========================
-    def tune_models(self):
-
-        print("\n[3/6] Hyperparameter Tuning...")
-
-        self.models = {}
-
-        # Logistic Regression
-        log_search = RandomizedSearchCV(
-            LogisticRegression(max_iter=1000),
-            {"C": [0.1, 1]},
-            n_iter=2,
-            scoring="recall",
-            cv=2,
-            n_jobs=1
-        )
-        log_search.fit(self.X_train, self.y_train)
-        self.models["Logistic Regression"] = log_search.best_estimator_
-
-        print("✓ LR:", log_search.best_params_)
-
-        # Random Forest
-        rf_search = RandomizedSearchCV(
-            RandomForestClassifier(n_jobs=1),
-            {
-                "n_estimators": [100, 150],
-                "max_depth": [10, 15]
-            },
-            n_iter=3,
-            scoring="recall",
-            cv=2,
-            n_jobs=1
-        )
-        rf_search.fit(self.X_train, self.y_train)
-        self.models["Random Forest"] = rf_search.best_estimator_
-
-        print("✓ RF:", rf_search.best_params_)
-
-        # XGBoost
-        if HAS_XGBOOST:
-
-            xgb_search = RandomizedSearchCV(
-                XGBClassifier(
-                    n_jobs=1,
-                    tree_method="hist"
-                ),
-                {
-                    "n_estimators": [100],
-                    "max_depth": [3, 6],
-                    "learning_rate": [0.1]
-                },
-                n_iter=2,
-                scoring="recall",
-                cv=2,
-                n_jobs=1
-            )
-
-            xgb_search.fit(self.X_train, self.y_train)
-            self.models["XGBoost"] = xgb_search.best_estimator_
-
-            print("✓ XGBoost:", xgb_search.best_params_)
-
-    # =========================
-    # EVALUATION + THRESHOLD
-    # =========================
-    def _evaluate(self, name, model):
-
-        y_proba = model.predict_proba(self.X_test)[:, 1]
-
-        best_metrics = None
-        best_threshold = 0.5
-
-        for threshold in np.arange(0.1, 0.9, 0.01):
-
-            y_pred = (y_proba >= threshold).astype(int)
-
-            p = precision_score(self.y_test, y_pred, zero_division=0)
-            r = recall_score(self.y_test, y_pred, zero_division=0)
-
-            if p >= 0.50 and r >= 0.70:
-                best_threshold = threshold
-                best_metrics = self._metrics(y_pred, y_proba)
-                break
-
-        if best_metrics is None:
-
-            best_f1 = -1
-
-            for threshold in np.arange(0.1, 0.9, 0.01):
-
-                y_pred = (y_proba >= threshold).astype(int)
-                f1 = f1_score(self.y_test, y_pred, zero_division=0)
-
-                if f1 > best_f1:
-                    best_f1 = f1
-                    best_threshold = threshold
-                    best_metrics = self._metrics(y_pred, y_proba)
-
-        self.results[name] = best_metrics
-
-        print(f"\n📊 {name}")
-        print(f"  Precision: {best_metrics['Precision']:.4f}")
-        print(f"  Recall   : {best_metrics['Recall']:.4f}")
-        print(f"  F1       : {best_metrics['F1']:.4f}")
-        print(f"  ROC-AUC  : {best_metrics['ROC-AUC']:.4f}")
-
-    # =========================
-    # METRICS
-    # =========================
-    def _metrics(self, y_pred, y_proba):
-
-        tn, fp, fn, tp = confusion_matrix(self.y_test, y_pred).ravel()
-
-        return {
-            "Precision": precision_score(self.y_test, y_pred, zero_division=0),
-            "Recall": recall_score(self.y_test, y_pred, zero_division=0),
-            "F1": f1_score(self.y_test, y_pred, zero_division=0),
-            "Accuracy": accuracy_score(self.y_test, y_pred),
-            "ROC-AUC": roc_auc_score(self.y_test, y_proba),
-            "PR-AUC": average_precision_score(self.y_test, y_proba),
-            "TP": int(tp),
-            "FP": int(fp),
-            "FN": int(fn),
-            "TN": int(tn)
+        models = {
+            "Logistic Regression": LogisticRegression(
+                class_weight='balanced', max_iter=1000, random_state=42),
+            "Random Forest": RandomForestClassifier(
+                n_estimators=100, class_weight='balanced',
+                max_depth=10, random_state=42, n_jobs=-1),
+            "XGBoost": xgb.XGBClassifier(
+                scale_pos_weight=scale_pos_weight,
+                n_estimators=200, max_depth=6,
+                learning_rate=0.05, subsample=0.8,
+                colsample_bytree=0.8, reg_alpha=0.1,
+                reg_lambda=1.0, random_state=42,
+                eval_metric='aucpr', verbosity=0)
         }
 
-    # =========================
-    # BEST MODEL SELECTION (NEW)
-    # =========================
-    def select_best_model(self):
+        print("\nTraining models with 5-fold cross-validation...")
+        trained = {}
+        for name, model in models.items():
+            print(f"\n  [{name}]")
+            cv_scores = cross_val_score(model, X_train, y_train,
+                                        cv=skf, scoring='recall', n_jobs=-1)
+            print(f"  CV Recall: {cv_scores.mean():.4f} +/- {cv_scores.std():.4f}")
+            model.fit(X_train, y_train)
+            metrics = self.evaluate(model, X_test, y_test, name)
+            self.results[name] = metrics
+            trained[name] = model
 
-        print("\n[4/6] Selecting best model...")
+        return trained, X_test, y_test
 
-        best_score = -1
+    def select_best(self, trained):
+        # Best = highest F1 score (balances precision and recall)
+        best_name = max(self.results, key=lambda n: self.results[n]["F1"])
+        print(f"\n  Best model: {best_name} (F1={self.results[best_name]['F1']:.4f})")
+        return best_name, trained[best_name]
 
-        for name, m in self.results.items():
+    def save(self, trained, best_name, best_model, X, y):
+        for name, model in trained.items():
+            fname = name.lower().replace(" ", "_") + ".pkl"
+            joblib.dump(model, self.output_dir / fname)
+        joblib.dump(best_model, self.output_dir / "best_model.pkl")
 
-            score = (0.5 * m["Precision"]) + (0.5 * m["Recall"])
+        scaler_src = repo_root / "data" / "preprocessed" / "scaler.joblib"
+        if scaler_src.exists():
+            import shutil
+            shutil.copy(scaler_src, self.output_dir / "scaler.pkl")
 
-            print(f"\n{name}")
-            print(f"  Precision: {m['Precision']:.4f}")
-            print(f"  Recall   : {m['Recall']:.4f}")
-            print(f"  Score    : {score:.4f}")
+        feature_names = list(X.columns)
+        (self.output_dir / "feature_names.json").write_text(json.dumps(feature_names))
 
-            if score > best_score:
-                best_score = score
-                self.best_model_name = name
+        metrics_path = self.output_dir / "metrics.json"
+        metrics_path.write_text(json.dumps(self.results, indent=2))
 
-        self.best_model = self.models[self.best_model_name]
+        fraud_rate = float(y.mean())
+        meta = {
+            "best_model": best_name,
+            "total_models_trained": len(trained),
+            "feature_count": len(feature_names),
+            "fraud_rate_full": round(fraud_rate, 4),
+            "best_recall": self.results[best_name]["Recall"],
+            "best_f1": self.results[best_name]["F1"],
+            "best_roc_auc": self.results[best_name]["ROC-AUC"],
+        }
+        (self.output_dir / "metadata.json").write_text(json.dumps(meta, indent=2))
 
-        print(f"\n🏆 BEST MODEL: {self.best_model_name}")
+        save_json(self.results, "model_metrics")
+        print("\n  All models saved.")
 
-    # =========================
-    # SAVE BEST MODEL
-    # =========================
-    def save_model(self):
-
-        output_dir = repo_root / "models" / "trained_models"
-        output_dir.mkdir(parents=True, exist_ok=True)
-
-        print("\n[5/6] Saving best model...")
-
-        with open(output_dir / "best_model.pkl", "wb") as f:
-            pickle.dump(self.best_model, f)
-
-        with open(output_dir / "all_models.pkl", "wb") as f:
-            pickle.dump(self.models, f)
-
-        with open(output_dir / "metrics.json", "w") as f:
-            json.dump(self.results, f, indent=2)
-
-        print("✓ Saved models + metrics")
-
-    # =========================
-    # RUN PIPELINE
-    # =========================
     def run(self):
-
-        print("\n" + "=" * 60)
-        print("PHASE 5: FINAL FRAUD PIPELINE")
-        print("=" * 60)
-
+        print("=" * 55)
+        print("PHASE 5: MODEL TRAINING")
+        print("=" * 55)
         X, y = self.load_data()
-        self.split_data(X, y)
-
-        self.tune_models()
-
-        for name, model in self.models.items():
-            self._evaluate(name, model)
-
-        self.select_best_model()
-        self.save_model()
-
-        print("\n✓ TRAINING COMPLETE")
-
+        trained, X_test, y_test = self.train(X, y)
+        best_name, best_model = self.select_best(trained)
+        self.save(trained, best_name, best_model, X, y)
+        print("\n✓ MODEL TRAINING COMPLETE")
+        print(f"  Best: {best_name}")
+        print(f"  Recall={self.results[best_name]['Recall']:.4f}  "
+              f"F1={self.results[best_name]['F1']:.4f}  "
+              f"ROC-AUC={self.results[best_name]['ROC-AUC']:.4f}")
+        return best_name, self.results
 
 if __name__ == "__main__":
-    ModelTrainer().run()
+    trainer = ModelTrainer()
+    trainer.run()

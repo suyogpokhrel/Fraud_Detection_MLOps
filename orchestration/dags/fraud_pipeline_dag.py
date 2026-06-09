@@ -19,7 +19,7 @@ from src.ingestion.load_to_mariadb import load_processed_csv
 from src.preprocessing.preprocess import PreprocessingPipeline
 from src.feature_engineering.engineer_features import FeatureEngineer
 from src.model_training.train_models import ModelTrainer
-from src.mlflow_tracking.mlflow_integration import MLflowExperimentTracker
+from src.mlflow_tracking.mlflow_integration import MLflowTracker
 from src.monitoring.drift_monitor import run_drift_report
 
 default_args = {
@@ -63,7 +63,7 @@ def task_train_models():
 
 def task_mlflow_log():
     print("[DAG] Starting: MLflow Integration")
-    tracker = MLflowExperimentTracker()
+    tracker = MLflowTracker()
     tracker.run(input_dir=repo_root / "models" / "trained_models")
     print("[DAG] Complete: MLflow Integration")
 

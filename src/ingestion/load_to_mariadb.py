@@ -1,81 +1,102 @@
+"""
+Phase 2: Load processed CSV into MariaDB.
+Reads from Redis cache if available, otherwise from CSV.
+"""
 from pathlib import Path
-import os
 import sys
 import pandas as pd
-from database.db_connection import get_connection
 
 repo_root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(repo_root))
 
-from src.cache.redis_client import save_dataframe, clear_pipeline_cache
+from src.cache.redis_client import load_dataframe, save_dataframe
+
+
+def get_db_connection():
+    try:
+        import mariadb
+        conn = mariadb.connect(
+            host="127.0.0.1",
+            port=3306,
+            user="fraud_mlops_user",
+            password="fraud_mlops_pass",
+            database="fraud_mlops"
+        )
+        return conn
+    except Exception as e:
+        print(f"  [MariaDB] Connection failed: {e}")
+        return None
 
 
 def load_processed_csv(repo_root: Path):
-    csv_path = repo_root / "data" / "processed" / "processed_data.csv"
-    if not csv_path.exists():
-        raise FileNotFoundError(f"Processed CSV not found: {csv_path}")
+    processed_path = repo_root / "data" / "processed" / "processed_data.csv"
 
-    df = pd.read_csv(csv_path)
+    print("\n" + "=" * 60)
+    print("PHASE 2: LOAD TO MARIADB")
+    print("=" * 60)
 
-    rename_map = {
-        "Acct type": "acct_type",
-        "Date of transaction": "date_of_transaction",
-        "Time of day": "time_of_day",
-    }
-    df = df.rename(columns=rename_map)
-
-    if "datetime" in df.columns:
-        df["datetime"] = pd.to_datetime(df["datetime"], errors="coerce")
-
-    insert_sql = """
-        INSERT INTO processed_transactions (
-            step, type, branch, amount, nameOrig, oldbalanceOrg, newbalanceOrig,
-            nameDest, oldbalanceDest, newbalanceDest, unusuallogin, isFlaggedFraud,
-            acct_type, date_of_transaction, time_of_day, isFraud, datetime
-        ) VALUES (
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-        )
-    """
-
-    conn = get_connection()
-    try:
-        cur = conn.cursor()
-        rows = []
-        for _, row in df.iterrows():
-            rows.append((
-                int(row["step"]) if pd.notna(row["step"]) else None,
-                row.get("type"),
-                row.get("branch"),
-                float(row["amount"]) if pd.notna(row["amount"]) else None,
-                row.get("nameOrig"),
-                float(row["oldbalanceOrg"]) if pd.notna(row["oldbalanceOrg"]) else None,
-                float(row["newbalanceOrig"]) if pd.notna(row["newbalanceOrig"]) else None,
-                row.get("nameDest"),
-                float(row["oldbalanceDest"]) if pd.notna(row["oldbalanceDest"]) else None,
-                float(row["newbalanceDest"]) if pd.notna(row["newbalanceDest"]) else None,
-                int(row["unusuallogin"]) if pd.notna(row["unusuallogin"]) else None,
-                int(row["isFlaggedFraud"]) if pd.notna(row["isFlaggedFraud"]) else None,
-                str(row.get("acct_type")) if pd.notna(row.get("acct_type")) else None,
-                str(row.get("date_of_transaction")) if pd.notna(row.get("date_of_transaction")) else None,
-                str(row.get("time_of_day")) if pd.notna(row.get("time_of_day")) else None,
-                int(row["isFraud"]) if pd.notna(row["isFraud"]) else None,
-                str(row["datetime"]) if pd.notna(row["datetime"]) else None,
-            ))
-        cur.executemany(insert_sql, rows)
-        conn.commit()
-        print(f"Inserted {len(rows)} rows into processed_transactions")
-    finally:
-        conn.close()
-
-    # Clear old pipeline cache, then cache fresh raw data for next steps
-    clear_pipeline_cache()
-    saved = save_dataframe("fraud:raw_data", df)
-    if saved:
-        print(f"Cached {len(df)} rows to Redis key 'fraud:raw_data'")
+    # Try Redis first
+    print("\n[1/3] Loading data...")
+    df = load_dataframe("pipeline:processed")
+    if df is not None:
+        print(f"  Loaded from Redis cache: {df.shape}")
     else:
-        print("Redis unavailable — pipeline will use MariaDB directly")
+        print(f"  Redis unavailable, loading from CSV...")
+        if not processed_path.exists():
+            raise FileNotFoundError(f"Processed CSV not found: {processed_path}")
+        df = pd.read_csv(processed_path)
+        print(f"  Loaded from CSV: {df.shape}")
+        save_dataframe("pipeline:processed", df)
+
+    # Keep only columns that match the schema
+    cols = ["step", "type", "amount", "nameOrig",
+            "oldbalanceOrg", "newbalanceOrig",
+            "nameDest", "oldbalanceDest", "newbalanceDest", "isFraud"]
+    df = df[[c for c in cols if c in df.columns]]
+    print(f"  Columns: {list(df.columns)}")
+
+    # Connect to MariaDB
+    print("\n[2/3] Connecting to MariaDB...")
+    conn = get_db_connection()
+    if conn is None:
+        print("  MariaDB unavailable — skipping DB load.")
+        print("  Data is cached in Redis for downstream steps.")
+        return
+
+    cursor = conn.cursor()
+    cursor.execute("TRUNCATE TABLE processed_transactions")
+
+    # Insert rows
+    print("\n[3/3] Inserting rows...")
+    insert_sql = """
+        INSERT INTO processed_transactions
+        (step, type, amount, nameOrig, oldbalanceOrg, newbalanceOrig,
+         nameDest, oldbalanceDest, newbalanceDest, isFraud)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """
+    batch_size = 5000
+    total = 0
+    for i in range(0, len(df), batch_size):
+        batch = df.iloc[i:i + batch_size]
+        rows = [tuple(row) for row in batch[cols[:-1] + ["isFraud"]].itertuples(index=False)]
+        cursor.executemany(insert_sql, rows)
+        conn.commit()
+        total += len(batch)
+        print(f"  Inserted {total:,} / {len(df):,} rows...", end="\r")
+
+    print(f"\n  Total rows inserted: {total:,}")
+
+    # Verify
+    cursor.execute("SELECT COUNT(*) FROM processed_transactions")
+    count = cursor.fetchone()[0]
+    fraud_count = df["isFraud"].sum()
+    print(f"  DB row count:  {count:,}")
+    print(f"  Fraud rows:    {fraud_count:,}")
+
+    cursor.close()
+    conn.close()
+    print("\n✓ LOAD TO MARIADB COMPLETE")
 
 
 if __name__ == "__main__":
-    repo_root = Path(__file__).resolve().parents[2]
     load_processed_csv(repo_root)
