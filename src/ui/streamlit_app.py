@@ -2,11 +2,12 @@
 Streamlit UI for Fraud Detection API
 """
 import streamlit as st
+import os
 import requests
 import json
 import pandas as pd
 
-API_URL = "http://fastapi_backend:8000"
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 st.set_page_config(
     page_title="Fraud Detection System",

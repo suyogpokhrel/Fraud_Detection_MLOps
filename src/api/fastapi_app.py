@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 import uvicorn
 
-repo_root = Path(__file__).resolve().parents[2]
+repo_root = Path(__file__).resolve().parent
 sys.path.insert(0, str(repo_root))
 
 app = FastAPI(
