@@ -8,3 +8,6 @@ joblib
 requests
 streamlit
 xgboost
+redis
+evidently
+pytest
