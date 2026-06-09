@@ -319,3 +319,52 @@ if __name__ == "__main__":
     print("Redoc: http://127.0.0.1:8000/redoc")
     print()
     uvicorn.run(app, host="127.0.0.1", port=8000)
+
+
+# ─── Monitoring Middleware ────────────────────────────────────────────────────
+
+import time
+from fastapi import Request
+from collections import defaultdict
+
+# In-memory metrics store
+_metrics = {
+    "total_requests": 0,
+    "failed_requests": 0,
+    "total_response_time_ms": 0.0,
+    "endpoint_counts": defaultdict(int),
+}
+
+@app.middleware("http")
+async def monitoring_middleware(request: Request, call_next):
+    """Track every request — count, timing, errors."""
+    start = time.time()
+    _metrics["total_requests"] += 1
+    _metrics["endpoint_counts"][request.url.path] += 1
+
+    try:
+        response = await call_next(request)
+        if response.status_code >= 400:
+            _metrics["failed_requests"] += 1
+        elapsed_ms = (time.time() - start) * 1000
+        _metrics["total_response_time_ms"] += elapsed_ms
+        return response
+    except Exception as e:
+        _metrics["failed_requests"] += 1
+        raise e
+
+
+@app.get("/metrics")
+def get_metrics():
+    """API monitoring metrics — open in browser to see stats."""
+    total = _metrics["total_requests"]
+    avg_response_ms = (
+        _metrics["total_response_time_ms"] / total if total > 0 else 0.0
+    )
+    return {
+        "total_requests": total,
+        "failed_requests": _metrics["failed_requests"],
+        "success_rate_pct": round((total - _metrics["failed_requests"]) / total * 100, 2) if total > 0 else 100.0,
+        "avg_response_time_ms": round(avg_response_ms, 2),
+        "endpoint_counts": dict(_metrics["endpoint_counts"]),
+    }
