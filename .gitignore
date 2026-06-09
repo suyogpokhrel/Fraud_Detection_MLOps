@@ -9,3 +9,8 @@ mlruns/
 .ipynb_checkpoints/
 
 venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.db
