@@ -29,3 +29,13 @@ orchestration/logs/
 
 # Reports (generated at runtime)
 reports/drift/
+
+# Pipeline outputs
+data/processed/
+data/preprocessed/*.csv
+data/preprocessed/*.joblib
+data/engineered_features/*.csv
+data/raw/Datasets.csv
+
+# Airflow runtime
+orchestration/airflow.db
