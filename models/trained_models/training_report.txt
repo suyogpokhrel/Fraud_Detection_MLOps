@@ -1,0 +1,42 @@
+================================================================================
+FRAUD DETECTION MODEL TRAINING REPORT
+================================================================================
+
+DATASET INFORMATION:
+  Train samples: 8090
+  Test samples: 2023
+  Fraud rate (train): 0.67%
+  Fraud rate (test): 0.69%
+
+MODEL PERFORMANCE COMPARISON:
+--------------------------------------------------------------------------------
+
+Logistic Regression:
+  Accuracy:      0.9689
+  Precision:     0.1549
+  Recall:        0.7857
+  F1:            0.2588
+  ROC-AUC:       0.8738
+  PR-AUC:        0.4618
+
+Random Forest:
+  Accuracy:      0.9941
+  Precision:     0.6000
+  Recall:        0.4286
+  F1:            0.5000
+  ROC-AUC:       0.9830
+  PR-AUC:        0.5527
+
+XGBoost:
+  Accuracy:      0.9965
+  Precision:     0.8889
+  Recall:        0.5714
+  F1:            0.6957
+  ROC-AUC:       0.9906
+  PR-AUC:        0.7885
+
+
+BEST MODEL: Logistic Regression
+  Primary metric (Recall): 0.7857
+  ROC-AUC: 0.8738
+  Fraud catch rate: 11 / 14 frauds caught

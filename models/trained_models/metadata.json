@@ -1,0 +1,9 @@
+{
+  "best_model": "XGBoost",
+  "total_models_trained": 3,
+  "feature_count": 20,
+  "fraud_rate_full": 0.0931,
+  "best_recall": 0.9957,
+  "best_f1": 0.9973,
+  "best_roc_auc": 0.9995
+}

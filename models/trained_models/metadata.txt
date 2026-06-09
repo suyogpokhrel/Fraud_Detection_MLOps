@@ -1,0 +1,6 @@
+best_model: Logistic Regression
+total_models_trained: 3
+test_set_size: 2023
+fraud_rate_test: 0.69%
+best_recall: 0.7857
+best_roc_auc: 0.8738
