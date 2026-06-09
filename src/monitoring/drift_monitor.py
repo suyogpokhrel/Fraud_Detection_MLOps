@@ -7,14 +7,12 @@ and generates an HTML drift report.
 import sys
 from pathlib import Path
 import pandas as pd
+import numpy as np
 import warnings
 warnings.filterwarnings('ignore')
 
 repo_root = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(repo_root))
-
-from evidently.report import Report
-from evidently.metric_preset import DataDriftPreset, DataQualityPreset
 
 
 def run_drift_report(
@@ -39,12 +37,10 @@ def run_drift_report(
     reference_df = pd.read_csv(reference_path)
     current_df = pd.read_csv(current_path)
 
-    # Use common columns only
     common_cols = list(set(reference_df.columns) & set(current_df.columns))
     reference_df = reference_df[common_cols]
     current_df = current_df[common_cols]
 
-    # Sample to keep report fast (max 5000 rows each)
     ref_sample = reference_df.sample(min(5000, len(reference_df)), random_state=42)
     cur_sample = current_df.sample(min(5000, len(current_df)), random_state=42)
 
@@ -52,6 +48,10 @@ def run_drift_report(
     print(f"  ✓ Current:   {len(cur_sample)} rows, {len(common_cols)} features")
 
     print("\n[2/3] Running drift analysis...")
+
+    from evidently.legacy.report import Report
+    from evidently.legacy.metric_preset import DataDriftPreset, DataQualityPreset
+
     report = Report(metrics=[
         DataDriftPreset(),
         DataQualityPreset(),
