@@ -1,6 +1,6 @@
 """
 Basic pipeline tests for CI/CD
-Tests: Redis client, drift monitor import, API health
+Tests: Redis client, drift monitor, feature engineering, preprocessing, model loading, API health
 """
 import sys
 from pathlib import Path
@@ -15,7 +15,6 @@ sys.path.insert(0, str(repo_root))
 # ─── Redis Client Tests ───────────────────────────────────────────────────────
 
 def test_redis_client_imports():
-    """Redis client module should import without errors."""
     from src.cache.redis_client import (
         get_client, save_dataframe, load_dataframe,
         save_json, load_json, clear_pipeline_cache
@@ -23,23 +22,16 @@ def test_redis_client_imports():
     assert callable(save_dataframe)
     assert callable(load_dataframe)
 
-
 def test_redis_client_handles_unavailable():
-    """Redis client should return None gracefully when Redis is down."""
     from src.cache.redis_client import get_client
-    # In CI, Redis is not running — should return None, not crash
     client = get_client()
-    # Either None (unavailable) or a real client (if Redis is running)
     assert client is None or client is not None
 
-
 def test_save_load_dataframe_no_redis():
-    """save_dataframe should return False gracefully when Redis is down."""
     from src.cache.redis_client import save_dataframe, load_dataframe
     df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
     result = save_dataframe("test:key", df)
     assert isinstance(result, bool)
-
     loaded = load_dataframe("test:key")
     assert loaded is None or isinstance(loaded, pd.DataFrame)
 
@@ -47,24 +39,34 @@ def test_save_load_dataframe_no_redis():
 # ─── Drift Monitor Tests ──────────────────────────────────────────────────────
 
 def test_drift_monitor_imports():
-    """Drift monitor module should import without errors."""
     from src.monitoring.drift_monitor import run_drift_report
     assert callable(run_drift_report)
 
-
 def test_drift_report_generates(tmp_path):
-    """Drift report should generate HTML file from sample data."""
     from src.monitoring.drift_monitor import run_drift_report
 
-    # Create small sample CSVs in tmp_path
+    # Use real PaySim feature columns (matches engineer_features.py output)
     df = pd.DataFrame({
-        "amount": np.random.uniform(100, 10000, 200),
-        "oldbalanceOrg": np.random.uniform(0, 50000, 200),
-        "newbalanceOrig": np.random.uniform(0, 50000, 200),
-        "oldbalanceDest": np.random.uniform(0, 50000, 200),
-        "newbalanceDest": np.random.uniform(0, 50000, 200),
-        "step": np.random.randint(1, 100, 200),
-        "unusuallogin": np.random.randint(0, 10, 200),
+        "step":                     np.random.randint(1, 100, 200),
+        "amount":                   np.random.uniform(100, 10000, 200),
+        "oldbalanceOrg":            np.random.uniform(0, 50000, 200),
+        "newbalanceOrig":           np.random.uniform(0, 50000, 200),
+        "oldbalanceDest":           np.random.uniform(0, 50000, 200),
+        "newbalanceDest":           np.random.uniform(0, 50000, 200),
+        "type_CASH_IN":             np.random.randint(0, 2, 200),
+        "type_CASH_OUT":            np.random.randint(0, 2, 200),
+        "type_DEBIT":               np.random.randint(0, 2, 200),
+        "type_PAYMENT":             np.random.randint(0, 2, 200),
+        "type_TRANSFER":            np.random.randint(0, 2, 200),
+        "sender_balance_change":    np.random.uniform(-5000, 5000, 200),
+        "receiver_balance_change":  np.random.uniform(-5000, 5000, 200),
+        "amount_ratio_sender":      np.random.uniform(0, 1, 200),
+        "amount_ratio_receiver":    np.random.uniform(0, 1, 200),
+        "sender_depletes_account":  np.random.randint(0, 2, 200),
+        "receiver_had_zero_balance":np.random.randint(0, 2, 200),
+        "is_transfer_or_cashout":   np.random.randint(0, 2, 200),
+        "balance_mismatch_sender":  np.random.uniform(0, 1000, 200),
+        "balance_mismatch_receiver":np.random.uniform(0, 1000, 200),
     })
 
     ref_path = tmp_path / "X_preprocessed.csv"
@@ -84,7 +86,6 @@ def test_drift_report_generates(tmp_path):
 # ─── Feature Engineering Tests ───────────────────────────────────────────────
 
 def test_feature_engineer_imports():
-    """FeatureEngineer should import without errors."""
     from src.feature_engineering.engineer_features import FeatureEngineer
     engineer = FeatureEngineer()
     assert engineer is not None
@@ -93,7 +94,6 @@ def test_feature_engineer_imports():
 # ─── Preprocessing Tests ─────────────────────────────────────────────────────
 
 def test_preprocessing_pipeline_imports():
-    """PreprocessingPipeline should import without errors."""
     from src.preprocessing.preprocess import PreprocessingPipeline
     pipeline = PreprocessingPipeline()
     assert pipeline is not None
@@ -102,9 +102,8 @@ def test_preprocessing_pipeline_imports():
 # ─── Model Loading Tests ──────────────────────────────────────────────────────
 
 def test_best_model_loads():
-    """best_model.pkl should load without errors."""
     import joblib
-    model_path = repo_root / "models" / "best_model.pkl"
+    model_path = repo_root / "models" / "trained_models" / "best_model.pkl"
     if not model_path.exists():
         pytest.skip("best_model.pkl not found — skipping in CI")
     model = joblib.load(model_path)
@@ -115,9 +114,10 @@ def test_best_model_loads():
 # ─── API Tests ────────────────────────────────────────────────────────────────
 
 def test_api_health():
-    """FastAPI app should import and have a health route."""
-    try:
-        from src.api.main import app
-        assert app is not None
-    except ImportError:
-        pytest.skip("API module not found — skipping in CI")
+    from fastapi.testclient import TestClient
+    from src.api.fastapi_app import app
+    client = TestClient(app)
+    r = client.get("/health")
+    assert r.status_code == 200
+    assert r.json()["status"] == "healthy"
+

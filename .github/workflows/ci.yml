@@ -22,8 +22,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install pytest pandas numpy scikit-learn joblib evidently redis
+          pip install -r requirements.txt
 
-      - name: Run tests
+      - name: Run pipeline tests (no model files required)
         run: |
           pytest tests/test_pipeline.py -v --tb=short

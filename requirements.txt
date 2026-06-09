@@ -11,3 +11,6 @@ xgboost
 redis
 evidently
 pytest
+mlflow
+httpx
+sqlalchemy
