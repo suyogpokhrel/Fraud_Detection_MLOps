@@ -39,3 +39,4 @@ data/raw/Datasets.csv
 
 # Airflow runtime
 orchestration/airflow.db
+reports/drift/
