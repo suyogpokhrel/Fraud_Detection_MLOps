@@ -36,7 +36,7 @@ services:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
-      retries: 3
+      retries: 5
     command: redis-server --appendonly yes
   fastapi_backend:
     build:
@@ -65,8 +65,8 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:8000/"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 40s
+      retries: 5
+      start_period: 60s
     networks:
       - fraud_network
     restart: unless-stopped
