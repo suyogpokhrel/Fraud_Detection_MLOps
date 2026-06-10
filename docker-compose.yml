@@ -51,10 +51,8 @@ services:
       - ./models:/app/models:ro
       - ./data/preprocessed:/app/data/preprocessed:ro
     depends_on:
-      redis:
-        condition: service_healthy
-      mariadb:
-        condition: service_healthy
+      - redis
+      - mariadb
     networks:
       - fraud_network
     restart: unless-stopped
