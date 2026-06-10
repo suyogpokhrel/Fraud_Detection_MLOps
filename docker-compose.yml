@@ -83,8 +83,7 @@ services:
       - STREAMLIT_SERVER_ADDRESS=0.0.0.0
       - PYTHONUNBUFFERED=1
     depends_on:
-      fastapi_backend:
-        condition: service_healthy
+      - fastapi_backend
     networks:
       - fraud_network
     restart: unless-stopped
