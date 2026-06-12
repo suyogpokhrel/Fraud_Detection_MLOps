@@ -1,15 +1,15 @@
 {
   "Logistic Regression": {
-    "Precision": 0.7162,
+    "Precision": 0.7152,
     "Recall": 0.9738,
-    "F1": 0.8254,
-    "Accuracy": 0.9616,
-    "ROC-AUC": 0.9902,
-    "PR-AUC": 0.9434,
+    "F1": 0.8247,
+    "Accuracy": 0.9615,
+    "ROC-AUC": 0.9901,
+    "PR-AUC": 0.9433,
     "TP": 1600,
-    "FP": 634,
+    "FP": 637,
     "FN": 43,
-    "TN": 15366
+    "TN": 15363
   },
   "Random Forest": {
     "Precision": 0.9988,
