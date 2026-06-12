@@ -1,8 +1,4 @@
-"""
-Phase 6: MLflow Tracking
-Loads trained models and metrics, logs everything to MLflow,
-registers the best model in the MLflow Model Registry.
-"""
+
 from pathlib import Path
 import sys
 import json

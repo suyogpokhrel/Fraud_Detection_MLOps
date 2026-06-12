@@ -1,20 +1,4 @@
-"""
-Phase 4: Feature Engineering Pipeline
-Loads preprocessed data from Redis or CSV,
-creates domain-specific fraud detection features,
-saves results to Redis and disk.
 
-Features created (based on EDA findings):
-  - sender_balance_change      : how much sender's balance changed
-  - receiver_balance_change    : how much receiver's balance changed
-  - amount_ratio_sender        : amount relative to sender's old balance
-  - amount_ratio_receiver      : amount relative to receiver's old balance
-  - sender_depletes_account    : sender goes from non-zero to zero balance
-  - receiver_had_zero_balance  : receiver had zero balance before tx
-  - is_transfer_or_cashout     : transaction type is TRANSFER or CASH_OUT
-  - balance_mismatch_sender    : expected vs actual balance change mismatch
-  - balance_mismatch_receiver  : expected vs actual balance change mismatch
-"""
 from pathlib import Path
 import sys
 import pandas as pd

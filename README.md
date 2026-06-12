@@ -17,7 +17,7 @@ End-to-end MLOps pipeline for detecting fraudulent financial transactions. Built
 | ROC-AUC | 0.9995 |
 | Tests | 31/31 passing |
 
-> PaySim is a synthetic dataset with mathematically generated fraud patterns, which is why the scores are this high. Real-world performance on actual transaction data would be lower.
+> PaySim is a synthetic dataset with mathematically generated fraud patterns, which is why the scores are this high in it. Real-world performance on actual transaction data would be lower.
 
 ---
 
@@ -87,7 +87,7 @@ Each step is a standalone script under `src/` and is also wired as an Airflow ta
 
 ## Quick Start
 
-### Run the full pipeline
+### Run full pipeline
 
 ```bash
 conda activate fraud_mlops
@@ -188,3 +188,5 @@ curl -X POST http://localhost:8000/predict \
 | Dashboard | Streamlit |
 | Deployment | Docker + Docker Compose |
 | CI | GitHub Actions |
+
+complete 

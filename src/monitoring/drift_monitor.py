@@ -1,8 +1,3 @@
-"""
-Evidently AI - Data Drift Monitoring
-Compares reference (training) data vs current data
-and generates an HTML drift report.
-"""
 
 import sys
 from pathlib import Path

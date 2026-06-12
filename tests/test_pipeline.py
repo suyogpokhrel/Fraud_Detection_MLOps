@@ -1,6 +1,5 @@
 """
 Basic pipeline tests for CI/CD
-Tests: Redis client, drift monitor, feature engineering, preprocessing, model loading, API health
 """
 import sys
 from pathlib import Path

@@ -1,7 +1,4 @@
-"""
-Phase 2: Load processed CSV into MariaDB.
-Reads from Redis cache if available, otherwise from CSV.
-"""
+
 from pathlib import Path
 import sys
 import pandas as pd

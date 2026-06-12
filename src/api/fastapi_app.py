@@ -1,6 +1,4 @@
-"""
-Phase 7: FastAPI Prediction API
-"""
+
 from pathlib import Path
 import sys
 import json

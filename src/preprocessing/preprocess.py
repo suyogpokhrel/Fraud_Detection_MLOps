@@ -1,9 +1,4 @@
-"""
-Phase 3: Preprocessing Pipeline
-Loads processed data from Redis or CSV,
-applies scaling and encoding,
-saves results to Redis and disk.
-"""
+
 from pathlib import Path
 import sys
 import pandas as pd

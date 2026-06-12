@@ -1,6 +1,5 @@
 """
 Integration tests for FastAPI prediction endpoints.
-Spins up the app with TestClient — no running server needed.
 """
 import pytest
 import json

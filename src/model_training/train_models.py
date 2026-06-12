@@ -1,9 +1,4 @@
-"""
-Phase 5: Model Training Pipeline
-Loads engineered features from Redis or CSV,
-trains XGBoost with class_weight handling,
-evaluates with cross-validation, saves best model.
-"""
+
 from pathlib import Path
 import sys
 import json
