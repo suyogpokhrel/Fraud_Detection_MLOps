@@ -1,0 +1,31 @@
+# Dockerfile for Airflow (Scheduler + Webserver via standalone)
+FROM python:3.11-slim
+
+ENV AIRFLOW_HOME=/opt/airflow
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /opt/airflow
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Airflow (pinned to match your local version) + project requirements
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir "apache-airflow==2.9.3" \
+    --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.9.3/constraints-3.11.txt" \
+    && pip install --no-cache-dir -r /tmp/requirements.txt
+
+# Copy project source code (DAGs import from src/)
+COPY src/ /opt/airflow/src/
+COPY orchestration/dags/ /opt/airflow/dags/
+
+# Create necessary directories
+RUN mkdir -p /opt/airflow/logs /opt/airflow/data /opt/airflow/models /opt/airflow/reports
+
+EXPOSE 8080
+
+# Run airflow standalone (creates db, admin user, runs webserver + scheduler)
+CMD ["airflow", "standalone"]

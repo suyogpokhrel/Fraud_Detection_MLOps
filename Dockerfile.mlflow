@@ -1,0 +1,18 @@
+# Dockerfile for MLflow Tracking Server
+FROM python:3.11-slim
+
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /mlflow
+
+# Install mlflow only (lightweight image)
+RUN pip install --no-cache-dir mlflow==3.13.0
+
+EXPOSE 5000
+
+# Serve MLflow UI backed by the shared SQLite db, with artifacts under mlruns/
+CMD ["mlflow", "server", \
+     "--backend-store-uri", "sqlite:////mlflow/mlflow.db", \
+     "--default-artifact-root", "/mlflow/mlruns", \
+     "--host", "0.0.0.0", \
+     "--port", "5000"]

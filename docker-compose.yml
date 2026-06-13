@@ -16,6 +16,7 @@ services:
     networks:
       - fraud_network
     restart: unless-stopped
+
   redis:
     image: redis:7-alpine
     container_name: fraud_redis
@@ -32,6 +33,58 @@ services:
       timeout: 5s
       retries: 5
     command: redis-server --appendonly yes
+
+  mlflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.mlflow
+    container_name: fraud_mlflow
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlflow.db:/mlflow/mlflow.db
+      - ./mlruns:/mlflow/mlruns
+    networks:
+      - fraud_network
+    restart: unless-stopped
+
+  airflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    container_name: fraud_airflow
+    ports:
+      - "8080:8080"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=sqlite:////opt/airflow/airflow.db
+      - AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/orchestration/dags
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__BASE_LOG_FOLDER=/opt/airflow/logs
+      - DB_HOST=mariadb
+      - DB_USER=fraud_user
+      - DB_PASSWORD=fraud_password
+      - DB_NAME=fraud_detection
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    volumes:
+      - ./orchestration:/opt/airflow/orchestration
+      - ./src:/opt/airflow/src
+      - ./data:/opt/airflow/data
+      - ./models:/opt/airflow/models
+      - ./reports:/opt/airflow/reports
+      - ./mlruns:/opt/airflow/mlruns
+      - ./mlflow.db:/opt/airflow/mlflow.db
+      - airflow_home:/opt/airflow/logs
+    depends_on:
+      - mariadb
+      - redis
+      - mlflow
+    networks:
+      - fraud_network
+    restart: unless-stopped
+
   fastapi_backend:
     build:
       context: .
@@ -48,14 +101,16 @@ services:
       - DB_PASSWORD=fraud_password
       - DB_NAME=fraud_detection
     volumes:
-      - ./models:/app/models:ro
-      - ./data/preprocessed:/app/data/preprocessed:ro
+      - ./models:/app/models
+      - ./data:/app/data
+      - ./reports:/app/reports
     depends_on:
       - redis
       - mariadb
     networks:
       - fraud_network
     restart: unless-stopped
+
   streamlit_frontend:
     build:
       context: .
@@ -68,16 +123,19 @@ services:
       - STREAMLIT_SERVER_PORT=8501
       - STREAMLIT_SERVER_ADDRESS=0.0.0.0
       - PYTHONUNBUFFERED=1
+    volumes:
+      - ./reports:/app/reports:ro
     depends_on:
       - fastapi_backend
     networks:
       - fraud_network
     restart: unless-stopped
+
 networks:
   fraud_network:
     driver: bridge
+
 volumes:
   mariadb_data:
   redis_data:
-  models:
-  preprocessed_data:
+  airflow_home:
