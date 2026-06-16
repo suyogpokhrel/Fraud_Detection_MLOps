@@ -15,3 +15,4 @@ mlflow
 httpx
 sqlalchemy
 dill
+mariadb==1.1.14

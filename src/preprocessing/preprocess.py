@@ -31,11 +31,40 @@ class PreprocessingPipeline:
     # ── helpers ───────────────────────────────────────────────────────────────
 
     def _load_data(self, repo_root: Path) -> pd.DataFrame:
-        """Load from Redis if available, otherwise from processed CSV."""
+        """Load from Redis, then MariaDB ColumnStore, then CSV."""
+        # 1. Try Redis
         df = load_dataframe("pipeline:processed")
         if df is not None:
             print(f"  Loaded from Redis: {df.shape}")
             return df
+
+        # 2. Try MariaDB ColumnStore
+        try:
+            import subprocess
+            result = subprocess.run(
+                ["mariadb", "-u", "fraud_user", "-pfraud_password",
+                 "fraud_detection", "-e",
+                 "SELECT step,type,amount,nameOrig,oldbalanceOrg,newbalanceOrig,nameDest,oldbalanceDest,newbalanceDest,isFraud FROM processed_transactions LIMIT 1;"],
+                capture_output=True, text=True, timeout=10
+            )
+            if result.returncode == 0 and "step" in result.stdout:
+                import io
+                full = subprocess.run(
+                    ["mariadb", "-u", "fraud_user", "-pfraud_password",
+                     "--batch", "--silent", "fraud_detection", "-e",
+                     "SELECT step,type,amount,nameOrig,oldbalanceOrg,newbalanceOrig,nameDest,oldbalanceDest,newbalanceDest,isFraud FROM processed_transactions;"],
+                    capture_output=True, text=True, timeout=60
+                )
+                cols = ["step","type","amount","nameOrig","oldbalanceOrg",
+                        "newbalanceOrig","nameDest","oldbalanceDest","newbalanceDest","isFraud"]
+                df = pd.read_csv(io.StringIO(full.stdout), sep="	", names=cols)
+                print(f"  Loaded from MariaDB ColumnStore: {df.shape}")
+                save_dataframe("pipeline:processed", df)
+                return df
+        except Exception as e:
+            print(f"  MariaDB ColumnStore unavailable: {e}")
+
+        # 3. Fall back to CSV
         csv_path = repo_root / "data" / "processed" / "processed_data.csv"
         if not csv_path.exists():
             raise FileNotFoundError(f"Processed CSV not found: {csv_path}")
