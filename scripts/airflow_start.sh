@@ -1,4 +1,7 @@
 #!/bin/bash
+# Remove stale PID files
+rm -f /opt/airflow/airflow-webserver.pid /opt/airflow/airflow-webserver-monitor.pid
+
 # Fix SQLite WAL mode and timeouts
 python3 -c "import sqlite3; conn = sqlite3.connect('/opt/airflow/airflow.db'); conn.execute('PRAGMA journal_mode=WAL'); conn.close()" 2>/dev/null || true
 # Fix worker timeout
